@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>计算器</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --accent: #38bdf8;
+    --accent2: #2563eb;
+    --muted: #8fa3b8;
+    --line: rgba(255,255,255,.08);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: radial-gradient(circle at 20% -10%, #12304a 0%, #0a0f1a 45%, #05070c 100%);
+    min-height: 100vh;
+    color: #e6edf6;
+    display: flex;
+    justify-content: center;
+    padding: 12px 12px 60px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app { width: 100%; max-width: 480px; }
+
+  /* ---------- 头部 ---------- */
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .logo {
+    width: 46px; height: 46px; border-radius: 14px; flex: 0 0 auto;
+    display: grid; place-items: center; font-size: 22px;
+    background: linear-gradient(135deg, #2563eb, #38bdf8);
+    box-shadow: 0 8px 24px rgba(56,189,248,.35);
+  }
+  header h1 { font-size: 19px; font-weight: 700; letter-spacing: .5px; }
+  header p { font-size: 12px; color: var(--muted); margin-top: 2px; letter-spacing: .3px; }
+
+  /* ---------- 标签页（图标版） ---------- */
+  .tabs {
+    display: flex; gap: 4px; padding: 5px; margin-bottom: 16px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid var(--line);
+    border-radius: 15px;
+  }
+  .tab {
+    flex: 1;
+    padding: 8px 2px 6px;
+    border: none; border-radius: 11px;
+    background: transparent; color: var(--muted);
+    font-family: inherit; cursor: pointer;
+    transition: .2s; white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tab svg {
+    width: 23px;
+    height: 23px;
+    display: block;
+    transition: .2s;
+  }
+  .tab-text {
+    font-size: 9.5px;
+    letter-spacing: .3px;
+    line-height: 1;
+    opacity: .9;
+  }
+  .tab.active {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff; font-weight: 600;
+    box-shadow: 0 5px 16px rgba(56,189,248,.32);
+  }
+  .tab.active .tab-text { opacity: 1; }
+
+  .panel { display: none; animation: fade .22s ease; }
+  .panel.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- 基础计算器 ---------- */
+  .display {
+    background: rgba(0,0,0,.38);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 18px 18px 14px;
+    min-height: 104px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    text-align: right; margin-bottom: 14px;
+    box-shadow: inset 0 2px 18px rgba(0,0,0,.4);
+  }
+  .expr {
+    font-size: 27px; font-weight: 500; letter-spacing: .5px;
+    word-break: break-all; line-height: 1.25; min-height: 34px;
+  }
+  .preview { font-size: 15px; color: var(--accent); margin-top: 7px; min-height: 20px; transition: .15s; }
+  .preview.err { color: #f87171; font-size: 13px; }
+
+  .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+  .key {
+    height: 58px; border-radius: 15px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.065);
+    color: #e6edf6; font-size: 19px; font-family: inherit;
+    cursor: pointer; transition: .12s;
+    user-select: none; -webkit-tap-highlight-color: transparent;
+  }
+  .key:hover { background: rgba(255,255,255,.13); }
+  .key:active { transform: scale(.95); background: rgba(255,255,255,.18); }
+  .key.op { color: var(--accent); font-weight: 600; font-size: 21px; }
+  .key.fn { color: #fbbf24; font-size: 17px; }
+  .key.eq {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff; border: none; font-weight: 700;
+    grid-row: span 2; height: auto;
+    box-shadow: 0 6px 18px rgba(56,189,248,.3);
+  }
+  .key.wide { grid-column: span 2; }
+
+  /* ---------- 表单 ---------- */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 2px; }
+  .input-group label {
+    font-size: 11.5px; color: var(--muted); letter-spacing: .5px;
+    padding-left: 2px; font-weight: 500;
+  }
+  .input-group input {
+    background: rgba(0,0,0,.32);
+    border: 1px solid rgba(255,255,255,.11);
+    border-radius: 12px;
+    padding: 12px 13px;
+    color: #fff; font-size: 15.5px; font-family: inherit;
+    outline: none; width: 100%;
+    transition: .18s;
+    font-variant-numeric: tabular-nums;
+  }
+  .input-group input::placeholder { color: #4a5b70; }
+  .input-group input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(56,189,248,.13);
+    background-color: rgba(0,0,0,.45);
+  }
+  .input-group input::-webkit-outer-spin-button,
+  .input-group input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .input-group input[type=number] { -moz-appearance: textfield; }
+
+  .section-title {
+    font-size: 12px; color: var(--muted); letter-spacing: 1px;
+    margin: 18px 0 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+  .section-title:first-child { margin-top: 0; }
+
+  .hint { font-size: 11.5px; color: #64748b; margin-top: 12px; line-height: 1.7; padding-left: 2px; }
+  .hint b { color: #94a3b8; }
+
+  /* ---------- 分段控件 ---------- */
+  .segmented {
+    display: flex; gap: 4px; padding: 4px;
+    background: rgba(0,0,0,.28); border: 1px solid var(--line);
+    border-radius: 13px;
+  }
+  .seg {
+    flex: 1; padding: 9px 6px; border: none; border-radius: 10px;
+    background: transparent; color: var(--muted);
+    font-size: 13px; font-family: inherit; cursor: pointer; transition: .2s;
+  }
+  .seg.active { background: rgba(56,189,248,.16); color: var(--accent); font-weight: 600; }
+
+  .mode-box { display: none; padding-top: 10px; }
+  .mode-box.active { display: block; animation: fade .22s ease; }
+
+  /* ---------- 九宫格方向选择器 ---------- */
+  .dir-picker {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+    padding: 10px;
+    background: rgba(0,0,0,.24);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
+
+  .dir-btn {
+    padding: 14px 4px;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: rgba(255,255,255,.05);
+    color: #cbd5e1;
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: .18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .dir-btn:hover { background: rgba(255,255,255,.12); }
+  .dir-btn:active { transform: scale(.95); }
+  .dir-btn.active {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff;
+    font-weight: 600;
+    border-color: transparent;
+    box-shadow: 0 5px 16px rgba(56,189,248,.32);
+  }
+
+  .dir-center {
+    display: grid;
+    place-items: center;
+    font-size: 24px;
+    color: var(--accent);
+    text-shadow: 0 0 16px rgba(56,189,248,.75);
+    user-select: none;
+    padding: 14px 0;
+  }
+
+  /* ---------- 主按钮 ---------- */
+  .btn-primary {
+    width: 100%; padding: 14px; margin-top: 16px;
+    border: none; border-radius: 13px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff; font-size: 15px; font-weight: 600;
+    font-family: inherit; letter-spacing: .5px; cursor: pointer;
+    transition: .15s;
+    box-shadow: 0 6px 20px rgba(56,189,248,.25);
+  }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-primary:active { transform: scale(.98); }
+
+  /* ---------- 结果 ---------- */
+  .results { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .res-item {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 12px 15px;
+    background: rgba(255,255,255,.045);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    animation: fade .25s ease;
+  }
+  .res-item .k { font-size: 13px; color: var(--muted); }
+  .res-item .v {
+    font-size: 17px; font-weight: 650;
+    font-variant-numeric: tabular-nums; letter-spacing: .3px;
+  }
+  .res-item .v small { font-size: 11.5px; color: var(--muted); font-weight: 400; margin-left: 3px; }
+  .res-item.err { border-left-color: #f87171; }
+  .res-item.err .v { color: #f87171; font-size: 14px; }
+  .res-item.hl { border-left-color: #34d399; }
+  .res-item.hl .v { color: #34d399; }
+
+  /* ---------- 罗盘 ---------- */
+  .compass-box {
+    margin-top: 16px; padding: 10px 6px 4px;
+    background: rgba(0,0,0,.22);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    display: none;
+  }
+  .compass-box.show { display: block; animation: fade .3s ease; }
+
+  /* ---------- 风罗盘 2×2 网格 ---------- */
+  .compass-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .compass-grid:empty { display: none; }
+
+  .mini-compass {
+    background: rgba(0,0,0,.22);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 6px 6px 9px;
+    text-align: center;
+    animation: fade .3s ease;
+  }
+
+  .mini-compass svg {
+    width: 100%;
+    max-width: 175px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .mini-label { font-size: 12.5px; font-weight: 600; margin-top: 2px; color: #e6edf6; }
+  .mini-value {
+    font-size: 14px; font-weight: 700; color: var(--accent);
+    margin-top: 1px; font-variant-numeric: tabular-nums; letter-spacing: .3px;
+  }
+  .mini-formula { font-size: 10px; color: #64748b; margin-top: 1px; }
+
+  /* ================= 三角形计算 ================= */
+  .tri-intro {
+    font-size: 12px; color: var(--muted); line-height: 1.6;
+    padding: 8px 8px;
+    /* background: rgba(56,189,248,.06); */
+    /* border: 0px solid rgba(56,189,248,.16); */
+    /* border-radius: 12px; */
+    margin-top: 4px;
+    margin-bottom: 8px;
+  }
+  .tri-intro b { color: var(--accent); }
+
+  .tri-card {
+    background: rgba(255,255,255,.045);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 12px;
+    animation: fade .25s ease;
+  }
+
+  .tri-head {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 9px;
+  }
+
+  .tri-figure {
+    width: 62px;
+    height: 62px;
+    flex: 0 0 auto;
+    background: rgba(0,0,0,.26);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 3px;
+  }
+  .tri-figure svg { width: 100%; height: 100%; display: block; }
+
+  .tri-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: .2px;
+  }
+  .tri-badge {
+    display: inline-block;
+    font-size: 10.5px;
+    color: var(--accent);
+    background: rgba(56,189,248,.1);
+    border: 1px solid rgba(56,189,248,.25);
+    padding: 2px 7px;
+    border-radius: 6px;
+    margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .4px;
+  }
+
+  .tri-desc {
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 11px;
+  }
+
+  .tri-input-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .tri-select {
+    flex: 0 1 auto;
+    max-width: 58%;
+    min-width: 0;
+    background: rgba(0,0,0,.32);
+    border: 1px solid rgba(255,255,255,.11);
+    border-radius: 12px;
+    padding: 12px 30px 12px 12px;
+    color: #fff;
+    font-size: 12.5px;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+    transition: .18s;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238fa3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    text-overflow: ellipsis;
+  }
+  .tri-select option { background: #0f172a; color: #e6edf6; }
+  .tri-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(56,189,248,.13);
+  }
+
+  .tri-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    background: rgba(0,0,0,.32);
+    border: 1px solid rgba(255,255,255,.11);
+    border-radius: 12px;
+    padding: 12px 13px;
+    color: #fff;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: .18s;
+    font-variant-numeric: tabular-nums;
+  }
+  .tri-input::placeholder { color: #4a5b70; }
+  .tri-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(56,189,248,.13);
+    background-color: rgba(0,0,0,.45);
+  }
+  .tri-input::-webkit-outer-spin-button,
+  .tri-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .tri-input[type=number] { -moz-appearance: textfield; }
+
+  .tri-results {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .tri-results:empty { display: none; }
+  .tri-results .tri-res:last-child:nth-child(odd) { grid-column: span 2; }
+
+  .tri-res {
+    background: rgba(0,0,0,.22);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 8px 11px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .tri-res .k { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .tri-res .v {
+    font-size: 14px;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .2px;
+    word-break: break-all;
+    text-align: right;
+  }
+
+  .footnote {
+    text-align: center; font-size: 11px; color: #3f4d5e;
+    margin-top: 26px; letter-spacing: .4px;
+  }
+</style>
+</head>
+<body oncontextmenu="return false">
+<div class="app">
+
+  <!-- <header>
+    <div class="logo">✈</div>
+    <div>
+      <h1>CAAC 计算器</h1>
+      <p>飞行常用计算工具</p>
+    </div>
+  </header> -->
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="basic" title="基础计算" aria-label="基础计算">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="4.5" y="3" width="15" height="18" rx="2.5"/>
+        <rect x="7.5" y="6.2" width="9" height="3.4" rx="1"/>
+        <circle cx="8.6" cy="13.4" r=".95" fill="currentColor" stroke="none"/>
+        <circle cx="12" cy="13.4" r=".95" fill="currentColor" stroke="none"/>
+        <circle cx="15.4" cy="13.4" r=".95" fill="currentColor" stroke="none"/>
+        <circle cx="8.6" cy="17" r=".95" fill="currentColor" stroke="none"/>
+        <circle cx="12" cy="17" r=".95" fill="currentColor" stroke="none"/>
+        <circle cx="15.4" cy="17" r=".95" fill="currentColor" stroke="none"/>
+      </svg>
+      <!-- <span class="tab-text">基础计算</span> -->
+    </button>
+
+    <button class="tab" data-tab="triangle" title="边长计算" aria-label="边长计算">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polygon points="4,20 20,20 4,4"/>
+        <path d="M4,15.4 L8.6,15.4 L8.6,20" stroke-width="1.3"/>
+      </svg>
+      <!-- <span class="tab-text">三角形</span> -->
+    </button>
+
+    <button class="tab" data-tab="bearing" title="方位计算" aria-label="方位计算">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="8.6" stroke-opacity="0.5" />
+        <line x1="12" y1="1.6" x2="12" y2="6.2"/>
+        <line x1="12" y1="17.8" x2="12" y2="22.4"/>
+        <line x1="1.6" y1="12" x2="6.2" y2="12"/>
+        <line x1="17.8" y1="12" x2="22.4" y2="12"/>
+        <circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none"/>
+      </svg>
+      <!-- <span class="tab-text">方位角</span> -->
+    </button>
+
+    <button class="tab" data-tab="wind" title="风向换算" aria-label="风向换算">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <!--
+        <line x1="3" y1="12" x2="18.6" y2="12"/>
+        <polyline points="13.6,7 19,12 13.6,17"/>
+        <line x1="4.2" y1="8.2" x2="7.8" y2="12"/>
+        <line x1="4.2" y1="15.8" x2="7.8" y2="12"/>
+        -->
+        <!-- <path d="M12,2 l10,20 l-10,-8 l-10,8 z" transform="rotate(90deg)" /> -->
+        <path d="M12,2 l10,20 l-10,-8 l-10,8 z" />
+      </svg>
+      <!-- <span class="tab-text">风向换算</span> -->
+    </button>
+    <button class="tab" data-tab="waypoint" title="航点管理" aria-label="航点管理">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="6" cy="18" r="2.6"/>
+        <circle cx="18" cy="6" r="2.6"/>
+        <line x1="8.2" y1="15.8" x2="15.8" y2="8.2" />
+      </svg>
+    </button>
+  </nav>
+
+  <!-- ================= 基础计算 ================= -->
+  <section class="panel active" id="tab-basic">
+    <div class="display">
+      <div class="expr" id="exprEl">0</div>
+      <div class="preview" id="previewEl"></div>
+    </div>
+
+    <div class="keys" id="keys">
+      <button class="key fn" data-action="clear">C</button>
+      <button class="key fn" data-action="back">⌫</button>
+      <button class="key fn" data-val="%">%</button>
+      <button class="key op" data-val="/">÷</button>
+
+      <button class="key fn" data-val="(">(</button>
+      <button class="key fn" data-val=")">)</button>
+      <button class="key fn" data-val="√">√</button>
+      <button class="key op" data-val="*">×</button>
+
+      <button class="key" data-val="7">7</button>
+      <button class="key" data-val="8">8</button>
+      <button class="key" data-val="9">9</button>
+      <button class="key op" data-val="-">−</button>
+
+      <button class="key" data-val="4">4</button>
+      <button class="key" data-val="5">5</button>
+      <button class="key" data-val="6">6</button>
+      <button class="key op" data-val="+">+</button>
+
+      <button class="key" data-val="1">1</button>
+      <button class="key" data-val="2">2</button>
+      <button class="key" data-val="3">3</button>
+      <button class="key eq" data-action="equals">=</button>
+
+      <button class="key fn" data-val="^2" title="平方">x²</button>
+      <button class="key" data-val="0">0</button>
+      <!-- <button class="key wide" data-val="0">0</button> -->
+      <button class="key" data-val=".">.</button>
+    </div>
+
+    <!-- <p class="hint">支持括号、根号、百分号；也可直接使用键盘输入。</p> -->
+  </section>
+
+  <!-- ================= 三角形 ================= -->
+  <section class="panel" id="tab-triangle">
+    <div class="tri-intro">根据已知边，自动计算其余边长。</div>
+    <div id="triCards"></div>
+  </section>
+
+  <!-- ================= 方位角 ================= -->
+  <section class="panel" id="tab-bearing">
+    <div class="segmented">
+      <button class="seg active" data-mode="B">方位 → 偏移</button>
+      <button class="seg" data-mode="A">方位角 → 反方位角</button>
+    </div>
+
+    <!-- 模式 A -->
+    <div class="mode-box" id="modeA">
+      <!-- <div class="section-title">反方位角</div> -->
+      <div class="section-title">方位角 A→B (°)</div>
+      <div class="input-group">
+        <!-- <label>方位角 A→B (°)</label> -->
+        <input id="az_in" type="number" step="any" placeholder="135">
+      </div>
+      <button class="btn-primary" id="btnAz">计算反方位角</button>
+
+      <div class="results" id="azResults"></div>
+      <div class="compass-box" id="compassBox1"></div>
+
+      <p class="hint">反方位角 = 原方位角 <b>+ 180°</b>，超过 360° 则减 360°。例：A→B = 135°，则 B→A = 315°。</p>
+    </div>
+
+    <!-- 模式 B -->
+    <div class="mode-box active" id="modeB">
+      <!-- <div class="section-title">方位角偏移</div> -->
+      <div class="section-title">方位</div>
+
+      <div class="dir-picker" id="dirPicker">
+        <button type="button" class="dir-btn" data-dir="315">西北 NW</button>
+        <button type="button" class="dir-btn" data-dir="0">北 N</button>
+        <button type="button" class="dir-btn" data-dir="45">东北 NE</button>
+
+        <button type="button" class="dir-btn" data-dir="270">西 W</button>
+        <!-- <div class="dir-center">✈</div> -->
+        <div class="dir-center">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px">
+            <path d="M12 21c-4.4-4.4-7-7.8-7-11a7 7 0 1 1 14 0c0 3.2-2.6 6.6-7 11z"/>
+            <circle cx="12" cy="10" r="2.5"/>
+          </svg>
+        </div>
+        <button type="button" class="dir-btn" data-dir="90">东 E</button>
+
+        <button type="button" class="dir-btn" data-dir="225">西南 SW</button>
+        <button type="button" class="dir-btn" data-dir="180">南 S</button>
+        <button type="button" class="dir-btn" data-dir="135">东南 SE</button>
+      </div>
+
+      <div class="input-group" style="margin-top:14px">
+        <label>偏转方向（仅基准方向的相邻方向）</label>
+        <div class="segmented" id="offsetDirSeg"></div>
+      </div>
+
+      <div class="input-group" style="margin-top:12px">
+        <label>偏移角度 (°)</label>
+        <input id="offsetDeg" type="number" step="any" placeholder="20" value="20">
+      </div>
+
+      <button class="btn-primary" id="btnOffset">计算方位偏移(角)</button>
+      <div class="results" id="offsetResults"></div>
+      <div class="compass-box" id="compassBox2"></div>
+
+      <p class="hint">
+        例：基准 <b>东南</b> 可偏 <b>东</b> 或偏 <b>南</b>；<br />
+        &emsp;&emsp;东南偏南 20° = 135° + 20° = <b>155°</b>，<br />
+        &emsp;&emsp;东南偏东 20° = 135° − 20° = <b>115°</b>。
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= 风向换算 ================= -->
+  <section class="panel" id="tab-wind">
+    <div class="input-group">
+      <label>风向 WD (°)　=　风的来向 / 航向 HD (°)　=　飞机的去向</label>
+      <input id="w_wd" type="number" step="any" placeholder="270">
+    </div>
+
+    <div id="wind2">
+      <div class="results" id="windAResults"></div>
+      <div class="compass-grid" id="windCompasses"></div>
+
+      <p class="hint" style="text-align: center;">
+        <b>风向箭头</b> 从风的来向指向中心，<b>飞机头</b> 指向航向。<!-- <br>
+        逆风飞行：航向 = 风向　·　顺风飞行：航向 = 风向 ± 180°<br>
+        正右侧风：航向 = 风向 − 90°　·　正左侧风：航向 = 风向 + 90° -->
+      </p>
+    </div>
+
+    <button class="btn-primary" style="display: none;" id="btnSave2png">保存</button>
+  </section>
+
+  <!-- ================= 航点 ================= -->
+  <section class="panel" id="tab-waypoint">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+      <defs>
+        <style>
+          .bg-circle {
+            stroke: #38bdf8;
+            stroke-opacity: 0.0625;
+            stroke-width: 12;
+            fill: none;
+          }
+    
+          .drone-line {
+            stroke: #2563eb;
+            stroke-width: 6;
+            fill: none;
+          }
+    
+          .drone-blade {
+            stroke: #2563eb;
+            stroke-width: 5;
+            fill: none;
+            stroke-linecap: round;
+          }
+        </style>
+      </defs>
+    
+      <path d="M 200 200 v 240 m 0 -120 h 200 m 0 -120 v 240" stroke="white" stroke-width="12" stroke-opacity="0.0625" fill="none" />
+
+      <!-- 背景淡紫色大圆 -->
+      <circle class="bg-circle" cx="300" cy="300" r="250" />
+      <!-- <rect x="30" y="30" width="540" height="540" rx="50" ry="50" fill="#38bdf8" stroke="#2563eb" stroke-width="0" /> -->
+    
+      <!-- 无人机连接臂 (X形) -->
+      <line class="drone-line" x1="260" y1="265" x2="195" y2="210" /> <!-- 左上 -->
+      <line class="drone-line" x1="340" y1="265" x2="405" y2="210" /> <!-- 右上 -->
+      <line class="drone-line" x1="260" y1="335" x2="195" y2="390" /> <!-- 左下 -->
+      <line class="drone-line" x1="340" y1="335" x2="405" y2="390" /> <!-- 右下 -->
+    
+      <!-- 左上螺旋桨 -->
+      <g>
+        <circle cx="190" cy="205" r="50" stroke="#2563eb" stroke-width="6" fill="none" />
+        <line class="drone-blade" x1="160" y1="230" x2="220" y2="180">
+          <animateTransform 
+            attributeName="transform" 
+            attributeType="XML" 
+            type="rotate" 
+            from="0 190 205" 
+            to="360 190 205" 
+            dur="1s" 
+            repeatCount="indefinite" 
+          />
+        </line>
+        <circle cx="190" cy="205" r="8" fill="#2563eb" />
+      </g>
+    
+      <!-- 右上螺旋桨 -->
+      <g>
+        <circle cx="410" cy="205" r="50" stroke="#2563eb" stroke-width="6" fill="none" />
+        <line class="drone-blade" x1="380" y1="180" x2="440" y2="230">
+          <animateTransform 
+            attributeName="transform" 
+            attributeType="XML" 
+            type="rotate" 
+            from="360 410 205" 
+            to="0 410 205" 
+            dur="1s" 
+            repeatCount="indefinite" 
+          />
+        </line>
+        <circle cx="410" cy="205" r="8" fill="#2563eb" />
+      </g>
+    
+      <!-- 左下螺旋桨 -->
+      <g>
+        <circle cx="190" cy="395" r="50" stroke="#2563eb" stroke-width="6" fill="none" />
+        <line class="drone-blade" x1="160" y1="370" x2="220" y2="420">
+          <animateTransform 
+              attributeName="transform" 
+              attributeType="XML" 
+              type="rotate" 
+              from="360 190 395" 
+              to="0 190 395" 
+              dur="1s" 
+              repeatCount="indefinite" 
+            />
+        </line>
+        <circle cx="190" cy="395" r="8" fill="#2563eb" />
+      </g>
+    
+      <!-- 右下螺旋桨 -->
+      <g>
+        <circle cx="410" cy="395" r="50" stroke="#2563eb" stroke-width="6" fill="none" />
+        <line class="drone-blade" x1="380" y1="420" x2="440" y2="370">
+          <animateTransform 
+            attributeName="transform" 
+            attributeType="XML" 
+            type="rotate" 
+            from="0 410 395" 
+            to="360 410 395" 
+            dur="1s" 
+            repeatCount="indefinite" 
+          />
+        </line>
+        <circle cx="410" cy="395" r="8" fill="#2563eb" />
+      </g>
+    
+      <!-- 中心机身 (圆角矩形) -->
+      <!-- <rect x="270" y="265" width="60" height="70" rx="10" ry="10" fill="none" stroke="#2563eb" stroke-width="5" /> -->
+      <rect x="260" y="250" width="80" height="100" rx="10" ry="10" fill="none" stroke="#2563eb" stroke-width="5" />
+    
+      <!-- 机身内部的小三角形 -->
+      <!-- <path d="M300,280 l7,15 l-14,0 z" fill="#2563eb" stroke="#2563eb" stroke-width="4" rx="10" ry="10" stroke-linejoin="round" /> -->
+    
+      <!-- 传感器/摄像头小圆点 -->
+      <!-- <circle cx="300" cy="290" r="3" fill="#38bdf8" /> -->
+    
+      <g transform="translate(252,252) scale(4)">
+        <defs>
+          <filter id="breath-glow">
+            <feGaussianBlur stdDeviation="6" result="blur"/>
+            <feFlood flood-color="#ff5a5f" flood-opacity="0.6" result="color"/>
+            <feComposite in="color" in2="blur" operator="over"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        <rect x="4.5" y="2.4" width="15" height="3.4" rx="1" fill="#38bdf8" stroke="#2563eb">
+          <animate attributeName="fill" values="#38bdf8;#2563eb;#38bdf8" dur="1s" repeatCount="indefinite" />
+          <!-- <animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite" /> -->
+        </rect>
+        <circle cx="7.1" cy="9.4" r="1" fill="#2563eb" stroke="none" />
+        <circle cx="12" cy="9.4" r="1" fill="#2563eb" stroke="none" />
+        <circle cx="16.9" cy="9.4" r="1" fill="#2563eb" stroke="none" />
+
+        <circle cx="7.1" cy="15" r="1" fill="#2563eb" stroke="none" />
+        <circle cx="12" cy="15" r="1" fill="#2563eb" stroke="none" />
+        <circle cx="16.9" cy="15" r="1" fill="#2563eb" stroke="none" />
+
+        <circle cx="7.1" cy="20.6" r="1" fill="#2563eb" stroke="none" />
+        <circle cx="12" cy="20.6" r="1" fill="#2563eb" stroke="none" />
+        <circle cx="16.9" cy="20.6" r="1" fill="#2563eb" stroke="none" />
+      </g>
+    </svg>
+  </section>
+  
+  <!-- <p class="footnote">仅用于地面站学习与估算，不可作为唯一飞行依据</p> -->
+  <p class="footnote">仅用于地面站考题的学习与计算 (v0.0.6 / 2026-10-25)</p>
+</div>
+
+<script>
+/* ==================== 通用工具 ==================== */
+const rad = d => d * Math.PI / 180;
+const deg = r => r * 180 / Math.PI;
+const norm360 = a => ((a % 360) + 360) % 360;
+const norm180 = a => { let x = norm360(a); return x > 180 ? x - 360 : x; };
+const $ = id => document.getElementById(id);
+
+function fmt(n, d = 1) {
+  if (!isFinite(n)) return '—';
+  return n.toFixed(d);
+}
+
+function fmtAngle(a) {
+  const r = Math.round(a * 10) / 10;
+  return Number.isInteger(r) ? String(r) : r.toFixed(1);
+}
+
+function renderResults(containerId, items) {
+  const el = $(containerId);
+  el.innerHTML = items.map(it => `
+    <div class="res-item ${it.cls || ''}">
+      <span class="k">${it.k}</span>
+      <span class="v">${it.v}${it.u ? `<small>${it.u}</small>` : ''}</span>
+    </div>`).join('');
+}
+
+const DIR_NAMES = ['北 N', '东北 NE', '东 E', '东南 SE', '南 S', '西南 SW', '西 W', '西北 NW'];
+function dirName(a) {
+  return DIR_NAMES[Math.round(norm360(a) / 45) % 8];
+}
+
+/* ==================== 标签页切换 ==================== */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    $('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+/* ==================== 表达式解析器 ==================== */
+function evaluate(str) {
+  const tokens = [];
+  let i = 0;
+  while (i < str.length) {
+    const c = str[i];
+    if (c === ' ') { i++; continue; }
+    if ((c >= '0' && c <= '9') || c === '.') {
+      let num = '';
+      while (i < str.length && ((str[i] >= '0' && str[i] <= '9') || str[i] === '.')) num += str[i++];
+      const v = parseFloat(num);
+      if (isNaN(v)) throw new Error('数字格式错误');
+      tokens.push({ t: 'num', v });
+      continue;
+    }
+    if ('+-*/()√%^'.includes(c)) { tokens.push({ t: 'op', v: c }); i++; continue; }
+    throw new Error('非法字符');
+  }
+
+  let p = 0;
+  const peek = () => tokens[p];
+  const eat = () => tokens[p++];
+
+  function expr() {
+    let v = term();
+    while (peek() && (peek().v === '+' || peek().v === '-')) {
+      const op = eat().v;
+      const r = term();
+      v = op === '+' ? v + r : v - r;
+    }
+    return v;
+  }
+
+  function term() {
+    let v = power();
+    while (peek() && ['*', '/'].includes(peek().v)) {
+      const op = eat().v;
+      const r = unary();
+      v = op === '*' ? v * r : v / r;
+    }
+    return v;
+  }
+
+  /* 幂运算层：优先级高于乘除，低于一元符号 */
+  function power() {
+    let v = unary();
+    while (peek() && peek().v === '^') {
+      eat();
+      const r = unary();
+      v = Math.pow(v, r);
+    }
+    return v;
+  }
+
+  function unary() {
+    if (peek() && peek().v === '-') { eat(); return -unary(); }
+    if (peek() && peek().v === '+') { eat(); return unary(); }
+    return postfix();
+  }
+
+  function postfix() {
+    let v = atom();
+    while (peek() && peek().v === '%') { eat(); v = v / 100; }
+    while (peek() && (peek().t === 'num' || peek().v === '(' || peek().v === '√')) {
+      v = v * unary();
+    }
+    return v;
+  }
+
+  function atom() {
+    const tk = peek();
+    if (!tk) throw new Error('表达式不完整');
+    if (tk.t === 'num') { eat(); return tk.v; }
+    if (tk.v === '(') {
+      eat();
+      const v = expr();
+      if (!peek() || peek().v !== ')') throw new Error('缺少右括号');
+      eat();
+      return v;
+    }
+    if (tk.v === '√') {
+      eat();
+      const v = unary();
+      if (v < 0) throw new Error('负数不能开平方');
+      return Math.sqrt(v);
+    }
+    throw new Error('语法错误');
+  }
+
+  const result = expr();
+  if (p < tokens.length) throw new Error('表达式有误');
+  if (!isFinite(result)) throw new Error('结果无效');
+  return result;
+}
+
+/* ==================== 基础计算器 ==================== */
+let expr = '';
+let justEvaluated = false;
+
+const exprEl = $('exprEl');
+const previewEl = $('previewEl');
+
+/* 显示优化：^2 → ² */
+const pretty = s => s
+  .replace(/\*/g, '×')
+  .replace(/\//g, '÷')
+  .replace(/\^2/g, '²');
+
+function fmtResult(n) {
+  if (!isFinite(n)) return '错误';
+  if (Number.isInteger(n) && Math.abs(n) < 1e15) return String(n);
+  const r = parseFloat(n.toPrecision(12));
+  if (Math.abs(r) >= 1e15 || (Math.abs(r) < 1e-9 && r !== 0)) return r.toExponential(6);
+  return String(r);
+}
+
+function render() {
+  exprEl.textContent = expr ? pretty(expr) : '0';
+  if (!expr.trim()) {
+    previewEl.textContent = '';
+    previewEl.classList.remove('err');
+    return;
+  }
+  try {
+    const v = evaluate(expr);
+    previewEl.textContent = '= ' + fmtResult(v);
+    previewEl.classList.remove('err');
+  } catch (e) {
+    previewEl.textContent = '';
+    previewEl.classList.remove('err');
+  }
+}
+
+function doEquals() {
+  if (!expr.trim()) return;
+  try {
+    const v = evaluate(expr);
+    expr = fmtResult(v);
+    justEvaluated = true;
+  } catch (e) {
+    previewEl.textContent = '表达式错误';
+    previewEl.classList.add('err');
+    return;
+  }
+  render();
+}
+
+/* 判断当前表达式末尾是否可追加平方 */
+function canAppendSquare() {
+  const t = expr.trim();
+  if (!t) return false;
+  return /[0-9)]$/.test(t);
+}
+
+$('keys').addEventListener('click', e => {
+  const btn = e.target.closest('.key');
+  if (!btn) return;
+  const action = btn.dataset.action;
+  const val = btn.dataset.val;
+
+  if (action === 'clear') { expr = ''; justEvaluated = false; }
+  else if (action === 'back') { expr = expr.slice(0, -1); justEvaluated = false; }
+  else if (action === 'equals') { doEquals(); return; }
+  else if (val === '^2') {
+    if (!canAppendSquare()) return;
+    expr += '^2';
+    justEvaluated = false;
+  }
+  else {
+    if (justEvaluated && (/[0-9.]/.test(val) || val === '√' || val === '(')) expr = '';
+    justEvaluated = false;
+    expr += val;
+  }
+  render();
+});
+
+document.addEventListener('keydown', e => {
+  if (!$('tab-basic').classList.contains('active')) return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+
+  const k = e.key;
+  if (/^[0-9.]$/.test(k)) { expr += k; justEvaluated = false; render(); e.preventDefault(); }
+  else if (['+', '-', '*', '/', '(', ')', '%'].includes(k)) { expr += k; justEvaluated = false; render(); e.preventDefault(); }
+  else if (k === 'Enter' || k === '=') { doEquals(); e.preventDefault(); }
+  else if (k === 'Backspace') { expr = expr.slice(0, -1); render(); e.preventDefault(); }
+  else if (k === 'Escape' || k === 'Delete') { expr = ''; justEvaluated = false; render(); e.preventDefault(); }
+  else if (k === 'r' || k === 'R') { expr += '√'; render(); e.preventDefault(); }
+  else if (k === 'q' || k === 'Q') { 
+    if (!canAppendSquare()) {
+      e.preventDefault(); 
+      return;
+    }
+    expr += '^2'; 
+    render(); 
+    e.preventDefault(); 
+  }
+});
+
+render();
+
+/* ==================== 罗盘绘制（方位角用） ==================== */
+function drawCompass(azDeg, compassBox, cps) {
+  const box = $(compassBox);
+  const cx = 200, cy = 200, R = 118;
+
+  const az  = norm360(azDeg);
+  const rev = norm360(az + 180);
+  const th  = rad(az);
+
+  const ux = Math.sin(th);
+  const uy = -Math.cos(th);
+
+  const p1 = { x: cx + R * ux, y: cy + R * uy };
+  const p2 = { x: cx - R * ux, y: cy - R * uy };
+
+  let nx = -Math.cos(th), ny = -Math.sin(th);
+  if (ny > 0) { nx = -nx; ny = -ny; }
+
+  const off = 16;
+  const t1 = { x: p1.x + nx * off, y: p1.y + ny * off };
+  const t2 = { x: p2.x - nx * off, y: p2.y - ny * off };
+
+  const anchorFor = dx => dx > 0.15 ? 'start' : (dx < -0.15 ? 'end' : 'middle');
+  const anchor1 = anchorFor(nx);
+  const anchor2 = anchorFor(-nx);
+
+  const badgeR = 96;
+  const bBadge = { x: cx + ux * badgeR, y: cy + uy * badgeR };
+  const aBadge = { x: cx - ux * badgeR, y: cy - uy * badgeR };
+
+  let ticks = '';
+  for (let i = 0; i < 360; i += 15) {
+    const a = rad(i);
+    const major = i % 45 === 0;
+    const r2 = major ? R - 13 : R - 7;
+    const x1 = cx + R * Math.sin(a),  y1 = cy - R * Math.cos(a);
+    const x2 = cx + r2 * Math.sin(a), y2 = cy - r2 * Math.cos(a);
+    ticks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"
+      stroke="rgba(255,255,255,${major ? '.30' : '.13'})" stroke-width="${major ? 1.6 : 1}" stroke-linecap="round"/>`;
+  }
+
+  const letters = [
+    { t: 'N', a: 0,   c: '#f87171' },
+    { t: 'E', a: 90,  c: '#94a3b8' },
+    { t: 'S', a: 180, c: '#94a3b8' },
+    { t: 'W', a: 270, c: '#94a3b8' }
+  ].map(l => {
+    const a = rad(l.a);
+    const x = cx + (R + 21) * Math.sin(a);
+    const y = cy - (R + 21) * Math.cos(a);
+    return `<text x="${x.toFixed(1)}" y="${(y + 4.5).toFixed(1)}" text-anchor="middle"
+      font-size="13" font-weight="700" fill="${l.c}"
+      font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">${l.t}</text>`;
+  }).join('');
+
+  const cross = (p, color) => `
+    <line x1="${(p.x - 11 - 53).toFixed(1)}" y1="${p.y.toFixed(1)}"
+          x2="${(p.x + 11 + 53).toFixed(1)}" y2="${p.y.toFixed(1)}"
+          stroke="${color}" stroke-width="1.0" stroke-linecap="round" stroke-opacity="0.5" stroke-dasharray="4 2"/>
+    <line x1="${p.x.toFixed(1)}" y1="${(p.y - 11 - 53).toFixed(1)}"
+          x2="${p.x.toFixed(1)}" y2="${(p.y + 11 + 53).toFixed(1)}"
+          stroke="${color}" stroke-width="1.0" stroke-linecap="round" stroke-opacity="0.5" stroke-dasharray="4 2"/>
+    <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="1.0"
+            fill="#0a0f1a" stroke="${color}" stroke-width="1.7"/>
+  `;
+
+  const badge = (p, label, color) => `
+    <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="10"
+            fill="#0a0f1a" stroke="${color || '#fbbf24'}" stroke-width="1.2"/>
+    <text x="${p.x.toFixed(1)}" y="${(p.y + 0.5).toFixed(1)}" text-anchor="middle"
+          dominant-baseline="central" font-size="12" font-weight="800" fill="${color || '#fbbf24'}"
+          font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">${label}</text>
+  `;
+
+  box.innerHTML = `
+  <svg viewBox="0 0 400 400" style="width:100%;height:auto;display:block;max-width:400px;margin:0 auto">
+    <defs>
+      <linearGradient id="lineGrad_${cps}" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38bdf8"/>
+        <stop offset="100%" stop-color="#2563eb"/>
+      </linearGradient>
+      <filter id="glow_${cps}" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+
+    <!--
+    <circle cx="200" cy="200" r="${R}" fill="rgba(255,255,255,.02)" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/>
+    <circle cx="200" cy="200" r="${R - 20}" fill="none" stroke="rgba(255,255,255,.045)" stroke-width="1"/>
+    -->
+    <!-- <circle cx="200" cy="200" r="${R}" fill="none" stroke="rgba(255,255,255,0.125)" stroke-width="1.5"/> -->
+
+    ${ticks}
+    ${letters}
+
+    ${cross(p1, '#666')}
+    ${cross(p2, '#666')}
+
+    <line x1="${p2.x.toFixed(1)}" y1="${p2.y.toFixed(1)}" x2="${p1.x.toFixed(1)}" y2="${p1.y.toFixed(1)}"
+          stroke="url(#lineGrad_${cps})" stroke-width="3" stroke-linecap="round" filter="url(#glow_${cps})"/>
+
+    <!-- <circle cx="200" cy="200" r="3.5" fill="#38bdf8"/> -->
+    <circle cx="${p2.x.toFixed(1)}" cy="${p2.y.toFixed(1)}" r="3.5" fill="#38bdf8"/>
+    <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="3.5" fill="#2563eb"/>
+
+    ${badge(bBadge, 'B', '#2563eb')}
+    ${badge(aBadge, 'A', '#38bdf8')}
+
+    <!--
+    <stop offset="0%" stop-color="#38bdf8"/>
+    <stop offset="100%" stop-color="#2563eb"/>
+    -->
+
+    <text x="${t1.x.toFixed(1)}" y="${t1.y.toFixed(1)}" text-anchor="${anchor1}"
+          dominant-baseline="middle" font-size="13" font-weight="700" fill="#2563eb"
+          font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">B-A = ${fmtAngle(rev)}°</text>
+    <text x="${t2.x.toFixed(1)}" y="${t2.y.toFixed(1)}" text-anchor="${anchor2}"
+          dominant-baseline="middle" font-size="13" font-weight="700" fill="#38bdf8"
+          font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">A-B = ${fmtAngle(az)}°</text>
+  </svg>`;
+
+  box.classList.add('show');
+}
+
+const segs = document.querySelectorAll('#tab-bearing > .segmented > .seg')
+segs.forEach(seg => {
+    seg.addEventListener('click', () => {
+      // document.querySelectorAll('.seg').forEach(s => s.classList.remove('active'));
+      segs.forEach(s => s.classList.remove('active'));
+      seg.classList.add('active');
+      document.querySelectorAll('.mode-box').forEach(m => m.classList.remove('active'));
+      $('mode' + seg.dataset.mode).classList.add('active');
+    });
+  });
+
+/* ==================== 方位角：反方位角 ==================== */
+$('btnAz').addEventListener('click', () => {
+  const az = parseFloat($('az_in').value);
+  if (!isFinite(az)) {
+    $('compassBox1').classList.remove('show');
+    $('compassBox1').innerHTML = '';
+    renderResults('azResults', [{ k: '提示', v: '请输入有效的方位角', cls: 'err' }]);
+    return;
+  }
+  const a = norm360(az);
+  const rev = norm360(a + 180);
+
+  drawCompass(a, 'compassBox1', 1);
+
+  renderResults('azResults', [
+    { k: '&emsp;方位角：A→B', v: fmt(a, 1) + '°' },
+    { k: '反方位角：B→A', v: fmt(rev, 1) + '°', cls: 'hl' }
+    // { k: '方向指示', v: dirName(a) + ' → ' + dirName(rev) }
+  ]);
+  localStorage.setItem("az", JSON.stringify({az: a, rev: rev}));
+});
+let azrs = localStorage.getItem("az");
+// console.log('azr', azrs);
+
+try {
+  if(azrs) {
+    let azr = JSON.parse(azrs);
+    $('az_in').value = azr.az;
+    $('btnAz').click();
+  }
+} catch (error) {
+  console.log('azr', error);
+}
+
+/* ==================== 方位角：偏移（九宫格） ==================== */
+let currentBaseDir = 135;
+
+function updateOffsetDirs(base) {
+  const offset = (base % 90 === 0) ? 90 : 45;
+  const ccw = norm360(base - offset);
+  const cw  = norm360(base + offset);
+
+  const seg = $('offsetDirSeg');
+  seg.innerHTML = `
+    <button type="button" class="seg" data-offdir="${ccw}">偏${dirName(ccw)}</button>
+    <button type="button" class="seg" data-offdir="${cw}">偏${dirName(cw)}</button>
+  `;
+
+  let segs = seg.querySelectorAll('.seg');
+  segs.forEach(s => {
+    s.addEventListener('click', () => {
+      seg.querySelectorAll('.seg').forEach(x => x.classList.remove('active'));
+      s.classList.add('active');
+    });
+  });
+
+  let last = seg.querySelector('.seg:last-child');
+  last.classList.add('active');
+}
+
+$('dirPicker').addEventListener('click', e => {
+  const btn = e.target.closest('.dir-btn');
+  if (!btn) return;
+  document.querySelectorAll('.dir-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentBaseDir = parseFloat(btn.dataset.dir);
+  updateOffsetDirs(currentBaseDir);
+});
+
+document.querySelector('.dir-btn[data-dir="135"]').classList.add('active');
+updateOffsetDirs(135);
+
+$('btnOffset').addEventListener('click', () => {
+  const activeSeg = $('offsetDirSeg').querySelector('.seg.active');
+  if (!activeSeg) {
+    renderResults('offsetResults', [{ k: '提示', v: '请选择偏转方向', cls: 'err' }]);
+    return;
+  }
+
+  const offDir = parseFloat(activeSeg.dataset.offdir);
+  const offDeg = parseFloat($('offsetDeg').value);
+
+  if (!isFinite(offDeg) || offDeg < 0) {
+    $('compassBox2').classList.remove('show');
+    $('compassBox2').innerHTML = '';
+    renderResults('offsetResults', [{ k: '提示', v: '请输入非负的偏移角度', cls: 'err' }]);
+    return;
+  }
+
+  const base = currentBaseDir;
+  const diff = norm180(offDir - base);
+  const sign = diff > 0 ? 1 : -1;
+  const result = norm360(base + sign * offDeg);
+
+  const baseName = dirName(base);
+  const offName  = dirName(offDir);
+
+
+  const a = result;
+  const rev = norm360(a + 180);
+
+  drawCompass(a, 'compassBox2', 2);
+
+  renderResults('offsetResults', [
+    { k: '基准方向', v: baseName + '　' + fmt(base, 0) + '°' },
+    { k: '偏移方式', v: '偏 ' + offName + ' → ' + fmt(offDeg, 1) + '°' },
+    { k: '计算结果：A→B', v: fmt(result, 1) + '°', cls: 'hl' },
+    { k: '反方位角：B→A', v: fmt(rev, 1) + '°', cls: 'hl' }
+    // { k: '方向指示', v: dirName(result) }
+  ]);
+});
+
+/* ==================== 风向换算（含罗盘） ==================== */
+function buildWindCompass(wd, hdg, label, formula) {
+  const cx = 80, cy = 80, R = 55;
+  const wdRad = rad(wd);
+
+  const wx = cx + R * Math.sin(wdRad);
+  const wy = cy - R * Math.cos(wdRad);
+
+  const arrowLen = R - 20;
+  const dx = -Math.sin(wdRad);
+  const dy = Math.cos(wdRad);
+  const tipX = wx + arrowLen * dx;
+  const tipY = wy + arrowLen * dy;
+
+  const h = 6, s = 7;
+  const px = -dy, py = dx;
+  const h1x = tipX - h * dx + s * px;
+  const h1y = tipY - h * dy + s * py;
+  const h2x = tipX - h * dx - s * px;
+  const h2y = tipY - h * dy - s * py;
+
+  const nsew = `
+    <text x="${cx}" y="16" text-anchor="middle" font-size="9" font-weight="700" fill="#f87171"
+          font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">N</text>
+    <text x="${cx + R + 14}" y="${cy + 3}" text-anchor="middle" font-size="9" fill="#94a3b8"
+          font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">E</text>
+    <text x="${cx}" y="${cy + R + 14}" text-anchor="middle" font-size="9" fill="#94a3b8"
+          font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">S</text>
+    <text x="${cx - R - 14}" y="${cy + 3}" text-anchor="middle" font-size="9" fill="#94a3b8"
+          font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">W</text>
+  `;
+
+  // const planePath = 'M0 -11 L1.8 -3.5 L10 -1.5 L10 1 L1.8 1.5 L3 8 L0.8 8 L0 5.5 L-0.8 8 L-3 8 L-1.8 1.5 L-10 1 L-10 -1.5 L-1.8 -3.5 Z';
+  //const planePath = 'M0 -11 L1.8 -3.5 L10 -1.5 L10 1 L1.8 1.5 L3 8 L0 6.5 L-3 8 L-1.8 1.5 L-10 1 L-10 -1.5 L-1.8 -3.5 Z';
+  const planePath = 'M0,-10 l10,20 l-10,-5 l-10,5 z';
+
+  return `
+    <div class="mini-compass">
+      <svg viewBox="0 0 160 160">
+        <!-- 
+        <circle cx="${cx}" cy="${cy}" r="${R}" fill="rgba(255,255,255,.02)" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/>
+        <circle cx="${cx}" cy="${cy}" r="${R - 18}" fill="none" stroke="rgba(255,255,255,.045)" stroke-width="1"/>
+        -->
+
+        <line x1="${cx - R}" y1="${cy}" x2="${cx + R}" y2="${cy}" stroke="#666" stroke-width="1" stroke-opacity="0.25" stroke-dasharray="4 2"></line>
+        <line x1="${cx}" y1="${cy - R}" x2="${cx}" y2="${cy + R}" stroke="#666" stroke-width="1" stroke-opacity="0.25" stroke-dasharray="4 2"></line>
+
+        ${nsew}
+
+        <line x1="${wx.toFixed(1)}" y1="${wy.toFixed(1)}" x2="${tipX.toFixed(1)}" y2="${tipY.toFixed(1)}"
+              stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
+        <polygon points="${tipX.toFixed(1)},${tipY.toFixed(1)} ${h1x.toFixed(1)},${h1y.toFixed(1)} ${h2x.toFixed(1)},${h2y.toFixed(1)}"
+                 fill="#f97316"/>
+
+        <g transform="translate(${cx},${cy}) rotate(${hdg})">
+          <path d="${planePath}" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+        </g>
+
+        <circle cx="${cx}" cy="${cy}" r="1.6" fill="#0a0f1a"/>
+      </svg>
+      <div class="mini-label">${label}</div>
+      <div class="mini-value">航向 = ${fmtAngle(hdg)}°</div>
+      <div class="mini-formula">${formula}</div>
+    </div>
+  `;
+}
+
+function renderWind(wd) {
+  const w = norm360(wd);
+  const h_head = norm360(w); // 逆风
+  const h_tail = norm360(w + 180); // 顺风
+
+  const h_left = norm360(w + 90); // 正左侧风
+  const h_right = norm360(w - 90); // 正右侧风
+
+  const h_left_front = norm360(w + 45); // 正左前侧风
+  const h_right_front = norm360(w -45); // 正右前侧风
+
+  const h_left_back = norm360(w + 135); // 正左后侧风
+  const h_right_back = norm360(w - 135); // 正右后侧风
+
+  const compasses = [
+    { hdg: h_head,  label: '逆风飞行',  formula: '航向 = 风向(' + w + '°)' },
+    { hdg: h_tail,  label: '顺风飞行',  formula: '航向 = 风向(' + w + '°) ± 180°' },
+    { hdg: h_left,  label: '正左侧风', formula: '航向 = 风向(' + w + '°) + 90°' },
+    { hdg: h_right, label: '正右侧风', formula: '航向 = 风向(' + w + '°) − 90°' },
+
+    { hdg: h_left_front,  label: '正左前侧风', formula: '航向 = 风向(' + w + '°) + 45°' },
+    { hdg: h_right_front, label: '正右前侧风', formula: '航向 = 风向(' + w + '°) − 45°' },
+    { hdg: h_left_back,  label: '正左后侧风', formula: '航向 = 风向(' + w + '°) + 135°' },
+    { hdg: h_right_back, label: '正右后侧风', formula: '航向 = 风向(' + w + '°) − 135°' }
+  ];
+
+  $('windCompasses').innerHTML = compasses
+    .map(c => buildWindCompass(w, c.hdg, c.label, c.formula))
+    .join('');
+
+  renderResults('windAResults', [
+    { k: '风向 WD', v: fmt(w, 1) + '°' },
+    { k: '逆风飞行 &emsp;→ 航向 = 风向(' + w + '°)', v: fmt(h_head, 1) + '°', cls: 'hl' },
+    { k: '顺风飞行 &emsp;→ 航向 = 风向(' + w + '°) ± 180° = ', v: fmt(h_tail, 1) + '°', cls: 'hl' },
+    { k: '正左侧风 &emsp;→ 航向 = 风向(' + w + '°) + 90° &ensp;= ', v: fmt(h_left, 1) + '°', cls: 'hl' },
+    { k: '正右侧风 &emsp;→ 航向 = 风向(' + w + '°) - 90° &ensp;= ', v: fmt(h_right, 1) + '°', cls: 'hl' },
+
+    { k: '正左前侧风 → 航向 = 风向(' + w + '°) + 45° &ensp;= ', v: fmt(h_left_front, 1) + '°', cls: 'hl' },
+    { k: '正右前侧风 → 航向 = 风向(' + w + '°) - 45° &ensp;= ', v: fmt(h_right_front, 1) + '°', cls: 'hl' },
+    { k: '正左后侧风 → 航向 = 风向(' + w + '°) + 135° = ', v: fmt(h_left_back, 1) + '°', cls: 'hl' },
+    { k: '正右后侧风 → 航向 = 风向(' + w + '°) - 135° = ', v: fmt(h_right_back, 1) + '°', cls: 'hl' }
+  ]);
+}
+
+$('w_wd').addEventListener('input', () => {
+  const wd = parseFloat($('w_wd').value);
+  if (!isFinite(wd)) {
+    $('windCompasses').innerHTML = '';
+    $('windAResults').innerHTML = '';
+    showSaveButton(false);
+    return;
+  }
+  showSaveButton(true);
+  renderWind(wd);
+});
+
+$('w_wd').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const wd = parseFloat($('w_wd').value);
+    if (isFinite(wd)) renderWind(wd);
+  }
+});
+
+if ($('w_wd').value) {
+  const wd = parseFloat($('w_wd').value);
+  if (isFinite(wd)) renderWind(wd);
+}
+
+/* ==================== 三角形计算 ==================== */
+function fmtTri(x) {
+  if (!isFinite(x)) return '—';
+  const r = Math.round(x * 1000) / 1000;
+  return String(r);
+}
+
+/* 各三角形示意图（100×100 视口，仅示意形状与角度） */
+const TRI_SVG = {
+  iso45: `
+    <svg viewBox="0 0 100 100">
+      <polygon points="20,82 82,82 20,20" fill="rgba(56,189,248,.14)" stroke="#38bdf8" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M20,73 L29,73 L29,82" fill="none" stroke="#38bdf8" stroke-width="1.6"/>
+      <text x="32" y="34" font-size="8" fill="#f87171" font-family="sans-serif">45°</text>
+      <text x="65" y="76" font-size="8" fill="#f87171" font-family="sans-serif">45°</text>
+      <text x="52" y="95" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="sans-serif">a</text>
+      <text x="11" y="55" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="sans-serif">a</text>
+      <text x="60" y="44" text-anchor="middle" font-size="8" fill="#fbbf24" font-family="sans-serif">c</text>
+    </svg>`,
+  tri369: `
+    <svg viewBox="0 0 100 100">
+      <polygon points="20,82 52,82 20,27" fill="rgba(56,189,248,.14)" stroke="#38bdf8" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M20,73 L29,73 L29,82" fill="none" stroke="#38bdf8" stroke-width="1.6"/>
+      <text x="23" y="38" font-size="8" fill="#f87171" font-family="sans-serif">30°</text>
+      <text x="34" y="76" font-size="8" fill="#f87171" font-family="sans-serif">60°</text>
+      <text x="35" y="95" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="sans-serif">a</text>
+      <text x="11" y="56" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="sans-serif">√3a</text>
+      <text x="46" y="47" text-anchor="middle" font-size="8" fill="#fbbf24" font-family="sans-serif">2a</text>
+    </svg>`,
+  tri345: `
+    <svg viewBox="0 0 100 100">
+      <polygon points="20,82 82,82 20,35" fill="rgba(56,189,248,.14)" stroke="#38bdf8" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M20,73 L29,73 L29,82" fill="none" stroke="#38bdf8" stroke-width="1.6"/>
+      <text x="23" y="47" font-size="8" fill="#f87171" font-family="sans-serif">53°</text>
+      <text x="64" y="76" font-size="8" fill="#f87171" font-family="sans-serif">37°</text>
+      <text x="51" y="95" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="sans-serif">4</text>
+      <text x="11" y="62" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="sans-serif">3</text>
+      <text x="60" y="52" text-anchor="middle" font-size="8" fill="#fbbf24" font-family="sans-serif">5</text>
+    </svg>`,
+  tri30iso: `
+    <svg viewBox="0 0 100 100">
+      <polygon points="50,20 30,82 70,82" fill="rgba(56,189,248,.14)" stroke="#38bdf8" stroke-width="2" stroke-linejoin="round"/>
+      <text x="43" y="32" font-size="8" fill="#f87171" font-family="sans-serif">30°</text>
+      <text x="27" y="76" font-size="8" fill="#f87171" font-family="sans-serif">75°</text>
+      <text x="63" y="76" font-size="8" fill="#f87171" font-family="sans-serif">75°</text>
+      <text x="34" y="52" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="sans-serif">l</text>
+      <text x="66" y="52" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="sans-serif">l</text>
+      <text x="50" y="95" text-anchor="middle" font-size="8" fill="#fbbf24" font-family="sans-serif">b</text>
+    </svg>`,
+    tri120iso: `
+    <svg viewBox="0 0 100 100">
+      <g transform="translate(0,-10)">
+        <polygon points="50,54 5,80 95,80" fill="rgba(56,189,248,.14)" stroke="#38bdf8" stroke-width="2" stroke-linejoin="round"/>
+        <text x="57" y="50" font-size="8" fill="#f87171" font-family="sans-serif">120°</text>
+        <text x="11" y="76" font-size="8" fill="#f87171" font-family="sans-serif">30°</text>
+        <text x="89" y="76" text-anchor="end" font-size="8" fill="#f87171" font-family="sans-serif">30°</text>
+        <text x="18" y="63" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="sans-serif">l</text>
+        <text x="82" y="63" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="sans-serif">l</text>
+        <text x="50" y="94" text-anchor="middle" font-size="8" fill="#fbbf24" font-family="sans-serif">b</text>
+      </g>
+    </svg>`,
+  tri120iso2: `
+    <svg viewBox="0 0 100 100">
+      <polygon points="50,18 14,82 86,82" fill="rgba(56,189,248,.14)" stroke="#38bdf8" stroke-width="2" stroke-linejoin="round"/>
+      <text x="42" y="32" font-size="8" fill="#f87171" font-family="sans-serif">120°</text>
+      <text x="18" y="78" font-size="8" fill="#f87171" font-family="sans-serif">30°</text>
+      <text x="74" y="78" font-size="8" fill="#f87171" font-family="sans-serif">30°</text>
+      <text x="36" y="53" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="sans-serif">l</text>
+      <text x="64" y="53" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="sans-serif">l</text>
+      <text x="50" y="95" text-anchor="middle" font-size="8" fill="#fbbf24" font-family="sans-serif">b</text>
+    </svg>`
+};
+
+const TRIANGLES = [
+  {
+    id: 'iso45',
+    name: '等腰直角三角形',
+    badge: '45° - 45° - 90° / 1 : 1 : √2',
+    desc: '两直角边相等，斜边 = 直角边 × √2，直角边 = 斜边 &divide; √2',
+    svg: TRI_SVG.iso45,
+    options: [
+      { v: 'a', label: '已知直角边 a' },
+      { v: 'c', label: '已知斜边 c' }
+    ],
+    calc(val, opt) {
+      let a, c;
+      if (opt === 'a') { a = val; c = a * Math.SQRT2; }
+      else             { c = val; a = c / Math.SQRT2; }
+      return [
+        { k: '直角边 a', v: fmtTri(a) },
+        { k: '直角边 b', v: fmtTri(a) },
+        { k: '斜边 c', v: fmtTri(c) }
+      ];
+    }
+  },
+  {
+    id: 'tri369',
+    name: '30° - 60° - 90° 直角三角形',
+    badge: '30° - 60° - 90° / 1 : √3 : 2',
+    desc: '俗称“369”三角形。短直角边对 30°，长直角边对 60°，斜边 = 2 × 短直角边',
+    svg: TRI_SVG.tri369,
+    options: [
+      { v: 'a', label: '已知短直角边（对30°）' },
+      { v: 'b', label: '已知长直角边（对60°）' },
+      { v: 'c', label: '已知斜边' }
+    ],
+    calc(val, opt) {
+      let a, b, c;
+      if (opt === 'a')      { a = val; b = a * Math.sqrt(3); c = 2 * a; }
+      else if (opt === 'b') { b = val; a = b / Math.sqrt(3); c = 2 * a; }
+      else                  { c = val; a = c / 2; b = a * Math.sqrt(3); }
+      return [
+        { k: '短直角边（对30°）', v: fmtTri(a) },
+        { k: '长直角边（对60°）', v: fmtTri(b) },
+        { k: '斜边', v: fmtTri(c) }
+      ];
+    }
+  },
+  {
+    id: 'tri345',
+    name: '3 - 4 - 5 直角三角形',
+    badge: '37° - 53° - 90° / 3 : 4 : 5',
+    desc: '三边比为 3 : 4 : 5，直角在 3 与 4 两条直角边之间',
+    svg: TRI_SVG.tri345,
+    options: [
+      { v: 'a', label: '已知短直角边（3k）' },
+      { v: 'b', label: '已知长直角边（4k）' },
+      { v: 'c', label: '已知斜边（5k）' }
+    ],
+    calc(val, opt) {
+      let a, b, c;
+      if (opt === 'a')      { a = val; b = 4 * val / 3; c = 5 * val / 3; }
+      else if (opt === 'b') { b = val; a = 3 * val / 4; c = 5 * val / 4; }
+      else                  { c = val; a = 3 * val / 5; b = 4 * val / 5; }
+      return [
+        { k: '短直角边（3k）', v: fmtTri(a) },
+        { k: '长直角边（4k）', v: fmtTri(b) },
+        { k: '斜边（5k）', v: fmtTri(c) }
+      ];
+    }
+  },
+  {
+    id: 'tri120iso',
+    name: '顶角 120° 等腰三角形',
+    badge: '30° - 30° - 120° / 1 : 1 : √3',
+    desc: '两腰相等，顶角 120°，底角各 30°。底边 = 腰 × √3，高 = 腰 ÷ 2',
+    svg: TRI_SVG.tri120iso,
+    options: [
+      { v: 'l', label: '已知腰长 l' },
+      { v: 'b', label: '已知底边 b' }
+    ],
+    calc(val, opt) {
+      const S3 = Math.sqrt(3);
+      let l, b;
+      if (opt === 'l') { l = val; b = l * S3; }
+      else             { b = val; l = b / S3; }
+      const h = l / 2;
+      return [
+        { k: '腰长 l', v: fmtTri(l) },
+        { k: '底边 b', v: fmtTri(b) },
+        { k: '高 h', v: fmtTri(h) }
+      ];
+    }
+  },
+  {
+    id: 'tri30iso',
+    name: '顶角 30° 等腰三角形',
+    badge: '30° - 75° - 75°',
+    desc: '两腰相等，顶角 30°，底角各 75°。常用于航向变化 30° 时的位移估算',
+    svg: TRI_SVG.tri30iso,
+    options: [
+      { v: 'l', label: '已知腰长 l' },
+      { v: 'b', label: '已知底边 b' }
+    ],
+    calc(val, opt) {
+      const sin15 = Math.sin(rad(15));
+      const cos15 = Math.cos(rad(15));
+      let l, b;
+      if (opt === 'l') { l = val; b = 2 * l * sin15; }
+      else             { b = val; l = b / (2 * sin15); }
+      const h = l * cos15;
+      return [
+        { k: '腰长 l', v: fmtTri(l) },
+        { k: '底边 b', v: fmtTri(b) },
+        { k: '高 h', v: fmtTri(h) }
+      ];
+    }
+  }
+];
+
+function buildTriCards() {
+  const wrap = $('triCards');
+  wrap.innerHTML = TRIANGLES.map(t => `
+    <div class="tri-card">
+      <div class="tri-head">
+        <div class="tri-figure">${t.svg}</div>
+        <div>
+          <div class="tri-title">${t.name}</div>
+          <span class="tri-badge">${t.badge}</span>
+        </div>
+      </div>
+      <p class="tri-desc">${t.desc}</p>
+      <div class="tri-input-row">
+        <select class="tri-select" data-tri="${t.id}">
+          ${t.options.map(o => `<option value="${o.v}">${o.label}</option>`).join('')}
+        </select>
+        <input class="tri-input" type="number" step="any" min="0" placeholder="输入长度" data-tri="${t.id}">
+      </div>
+      <div class="tri-results" id="res-${t.id}"></div>
+    </div>
+  `).join('');
+
+  TRIANGLES.forEach(t => {
+    const input = wrap.querySelector(`.tri-input[data-tri="${t.id}"]`);
+    const select = wrap.querySelector(`.tri-select[data-tri="${t.id}"]`);
+    const resBox = $(`res-${t.id}`);
+
+    const update = () => {
+      const val = parseFloat(input.value);
+      if (!isFinite(val) || val <= 0) {
+        resBox.innerHTML = '';
+        return;
+      }
+      const results = t.calc(val, select.value);
+      resBox.innerHTML = results.map(r => `
+        <div class="tri-res">
+          <span class="k">${r.k}</span>
+          <span class="v">${r.v}</span>
+        </div>
+      `).join('');
+    };
+
+    input.addEventListener('input', update);
+    select.addEventListener('change', update);
+  });
+}
+buildTriCards();
+
+async function saveImage(invoke, img, filename = 'image.png', scale = 2) {
+  // 创建 canvas，尺寸与原图一致
+  const canvas = document.createElement('canvas');
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+
+  // 绘制图片到 canvas
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  // 导出为 PNG 格式的 Data URL
+  // const dataURL = canvas.toDataURL('image/png');
+
+  // // 创建 a 标签并触发下载
+  // const link = document.createElement('a');
+  // link.download = filename;
+  // link.href = dataURL;
+  // link.click();
+
+  // await invoke('download_file', {
+  //     // url: 'https://www.baidu.com/img/flexible/logo/pc/result.png',
+  //     url: dataURL,
+  //     savePath: filename,
+  //     fileId: 'test',
+  // })
+
+  // const { WebviewWindow } = window.__TAURI__.webviewWindow
+  // const webview = new WebviewWindow('下载', {
+  //     url: dataURL,
+  //     x: 500,
+  //     y: 500,
+  //     width: 800,
+  //     height: 400,
+  //     focus: true,
+  //     title: 'PakePlus Window',
+  //     alwaysOnTop: true,
+  //     center: true,
+  //     resizable: true,
+  //     transparent: false,
+  //     visible: true,
+  // })
+  // webview.once('tauri://created', function () {
+  //     // webview successfully created
+  //     console.log('new webview created')
+  // })
+  // webview.once('tauri://error', function (e) {
+  //     // an error happened creating the webview
+  //     console.log('new webview error', e)
+  // })
+
+  // invoke('open_url', { url: dataURL })
+  // location.href = dataURL;
+
+  // // app
+  // const {
+  //     defaultWindowIcon,
+  //     fetchDataStoreIdentifiers,
+  //     getIdentifier,
+  //     getName,
+  //     getTauriVersion,
+  //     getVersion,
+  //     hide,
+  //     removeDataStore,
+  //     setDockVisibility,
+  //     setTheme,
+  //     show,
+  // } = window.__TAURI__.app;
+  // setDockVisibility(true);
+
+  // return;
+
+  // 转换为PNG并保存
+  const blob = await new Promise((resolve) => {
+      canvas.toBlob(resolve, 'image/png', 1.0)
+  })
+
+  if (!blob) throw new Error('无法创建Blob')
+  const arrayBuffer = await blob.arrayBuffer()
+  const uint8Array = new Uint8Array(arrayBuffer)
+  console.log('uint8Array11', uint8Array)
+
+  // path
+  const {
+      appDataDir,
+      appConfigDir,
+      appLocalDataDir,
+      appCacheDir,
+      appLogDir,
+      audioDir,
+      cacheDir,
+      configDir,
+      dataDir,
+      desktopDir,
+      documentDir,
+      downloadDir,
+      executableDir,
+      fontDir,
+      homeDir,
+      pictureDir,
+      publicDir,
+      resourceDir,
+      runtimeDir,
+      templateDir,
+      videoDir,
+      sep,
+      delimiter,
+      basename,
+      dirname,
+      extname,
+      join,
+      normalize,
+      resolve,
+      isAbsolute,
+      localDataDir,
+      resolveResource,
+      tempDir,
+  } = window.__TAURI__.path;
+  // const { writeTextFile } = window.__TAURI__.fs
+  const { writeFile } = window.__TAURI__.fs
+  const file = await writeFile(filename, uint8Array, {
+      // baseDir: BaseDirectory.Download,
+      baseDir: downloadDir,
+  });
+  console.log(file);
+  // Uncaught (in promise) failed to open file at path: drone.png with error: 拒绝访问。 (os error 5)
+  // Uncaught (in promise) Command plugin:app|set_dock_visibility not allowed by ACL
+}
+
+/* */
+window.addEventListener('DOMContentLoaded', () => {
+  const script = document.createElement('script');
+  script.src = 'https://unpkg.com/@zumer/snapdom@latest/dist/snapdom.js';
+  script.onload = () => {
+    // console.log('SnapDOM 脚本加载完成', window.snapdom);
+
+    if (typeof window.snapdom !== 'undefined') {
+      console.log('SnapDOM 已加载');
+      // $('btnSave2png').style.setProperty("display", 'block');
+      $('btnSave2png').addEventListener('click', async () => {
+        const wind2 = document.getElementById('wind2'), 
+          pd = "8px 20px 20px 20px",
+          bg = "radial-gradient(circle at 20% -10%, #12304a 0%, #0a0f1a 45%, #05070c 100%)";
+
+          wind2.style.setProperty("padding", pd);
+          wind2.style.setProperty("background", bg);
+
+        if ('__TAURI__' in window) {
+          const { invoke, checkPermissions, requestPermissions } = window.__TAURI__.core;
+          if (invoke) {
+            // if (checkPermissions("writeFile")) {
+            //   console.log("writeFile");
+            // }
+            // requestPermissions("writeFile");
+            const image = await snapdom.toPng(wind2, {scale: 2});
+            saveImage(invoke, image, 'drone.png');
+          }
+        } else {
+          snapdom.download(wind2, {scale: 2, format: 'png', filename: 'drone.png' })
+            .then(() => {
+              wind2.style.setProperty("background", null);
+              wind2.style.setProperty("padding", null);
+              console.log('下载完成');
+            })
+            .catch(err => console.error('下载失败', err));
+        }
+      });
+    }
+  };
+  document.head.appendChild(script);
+});
+
+function showSaveButton(show) {
+  const display = show === true && typeof window.snapdom !== 'undefined' ? "block" : "none";
+  $('btnSave2png').style.setProperty("display", display);
+}
+
+/* ==================== 回车快捷计算 ==================== */
+const enterBind = (ids, btnId) => {
+  ids.forEach(id => $(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') $(btnId).click();
+  }));
+};
+enterBind(['az_in'], 'btnAz');
+enterBind(['offsetDeg'], 'btnOffset');
+
+// 禁止右键菜单
+document.oncontextmenu = function() { return false; };
+</script>
+<!-- <script src="https://unpkg.com/@zumer/snapdom@latest/dist/snapdom.js"></script> -->
+</body>
+</html>
