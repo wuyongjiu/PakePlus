@@ -362,9 +362,10 @@
     color: #64748b;
     line-height: 1.5;
     margin-bottom: 11px;
+    padding-left: 72px;
   }
 
-  .tri-input-row {
+  /* .tri-input-row {
     display: flex;
     gap: 8px;
   }
@@ -394,11 +395,80 @@
   .tri-select:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(56,189,248,.13);
+  } */
+
+  /* ===== 三角形选项：input + label 相邻兄弟方案 ===== */
+  .tri-option-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: 10px;
+  }
+
+  /* radio 隐藏但保留键盘可访问性 */
+  .tri-option-row input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+    pointer-events: none;
+  }
+
+  .tri-option-row label.tri-option {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 40px;
+    border: 1px solid rgba(255,255,255,.11);
+    border-right: none;
+    background: rgba(0,0,0,.32);
+    color: var(--muted);
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: .15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 8px;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  .tri-option-row label.tri-option:first-of-type {
+    border-radius: 12px 0 0 12px;
+  }
+  .tri-option-row label.tri-option:last-of-type {
+    border-radius: 0 12px 12px 0;
+    border-right: 1px solid rgba(255,255,255,.11);
+  }
+
+  .tri-option-row label.tri-option:hover {
+    background: rgba(255,255,255,.07);
+    color: #e6edf6;
+  }
+
+  /* 选中态：input:checked 直接控制紧随其后的 label */
+  .tri-option-row input[type="radio"]:checked + label.tri-option {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff;
+    font-weight: 600;
+    border-color: transparent;
+  }
+
+  /* 键盘焦点 */
+  .tri-option-row input[type="radio"]:focus-visible + label.tri-option {
+    outline: 2px solid rgba(56,189,248,.55);
+    outline-offset: -2px;
   }
 
   .tri-input {
-    flex: 1 1 auto;
-    min-width: 0;
+    /* flex: 1 1 auto; min-width: 0; */
+    width: 100%;
     background: rgba(0,0,0,.32);
     border: 1px solid rgba(255,255,255,.11);
     border-radius: 12px;
@@ -421,9 +491,9 @@
   .tri-input[type=number] { -moz-appearance: textfield; }
 
   .tri-results {
-    display: grid;
+    /* display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
+    gap: 6px; */
     margin-top: 12px;
   }
   .tri-results:empty { display: none; }
@@ -438,6 +508,8 @@
     justify-content: space-between;
     align-items: baseline;
     gap: 6px;
+    margin-top: 10px;
+    margin-left: 72px;
   }
   .tri-res .k { font-size: 11px; color: var(--muted); white-space: nowrap; }
   .tri-res .v {
@@ -448,6 +520,146 @@
     word-break: break-all;
     text-align: right;
   }
+
+  /* ================= 航点管理 ================= */
+  .wp-form {
+    background: rgba(255,255,255,.045);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 14px;
+  }
+  .wp-form-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .wp-form-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(56,189,248,.8);
+  }
+  .wp-form-title.editing { color: #fbbf24; }
+  .wp-form-title.editing .dot { background: #fbbf24; box-shadow: 0 0 8px rgba(251,191,36,.8); }
+
+  .wp-btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .wp-btn-row .btn-primary { margin-top: 0; }
+
+  .wp-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .wp-empty {
+    text-align: center;
+    font-size: 12px;
+    color: #4a5b70;
+    padding: 28px 0;
+    border: 1px dashed var(--line);
+    border-radius: 14px;
+  }
+
+  .wp-card {
+    background: rgba(255,255,255,.045);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 14px;
+    padding: 12px 14px;
+    animation: fade .25s ease;
+  }
+  .wp-card.editing {
+    border-left-color: #fbbf24;
+    background: rgba(251,191,36,.05);
+  }
+
+  .wp-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .wp-card-name {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #e6edf6;
+    word-break: break-all;
+  }
+  .wp-card-name .arrow {
+    color: var(--accent);
+    margin: 0 6px;
+    font-size: 12px;
+    font-weight: 400;
+  }
+  .wp-card-actions {
+    display: flex;
+    gap: 6px;
+    flex: 0 0 auto;
+  }
+  .wp-card-actions button {
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.06);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 11.5px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: .15s;
+  }
+  .wp-card-actions button:hover { background: rgba(255,255,255,.14); color: #e6edf6; }
+  .wp-card-actions button.del:hover {
+    background: rgba(248,113,113,.15);
+    color: #f87171;
+    border-color: rgba(248,113,113,.3);
+  }
+
+  .wp-card-desc {
+    font-size: 11.5px;
+    color: #64748b;
+    margin-bottom: 9px;
+    line-height: 1.5;
+  }
+  .wp-card-desc b { color: #94a3b8; font-weight: 500; }
+
+  .wp-card-vals {
+    display: flex;
+    gap: 8px;
+  }
+  .wp-card-val {
+    flex: 1;
+    min-width: 0;
+    background: rgba(0,0,0,.22);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 7px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .wp-card-val .k {
+    font-size: 10.5px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .wp-card-val .v {
+    font-size: 14px;
+    font-weight: 650;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    flex: 0 0 auto;
+  }
+  .wp-card-val.rev .v { color: #60a5fa; }
 
   .footnote {
     text-align: center; font-size: 11px; color: #3f4d5e;
@@ -567,7 +779,7 @@
 
   <!-- ================= 三角形 ================= -->
   <section class="panel" id="tab-triangle">
-    <div class="tri-intro">根据已知边，自动计算其余边长。</div>
+    <div class="tri-intro">根据已知边，计算其余边长。</div>
     <div id="triCards"></div>
   </section>
 
@@ -583,15 +795,22 @@
       <!-- <div class="section-title">反方位角</div> -->
       <div class="section-title">方位角 A→B (°)</div>
       <div class="input-group">
-        <!-- <label>方位角 A→B (°)</label> -->
-        <input id="az_in" type="number" step="any" placeholder="135">
+        <div style="display: flex; gap: 0px;">
+          <div style="flex: 1;">
+            <!-- <label>方位角 A→B (°)</label> -->
+            <input id="az_in" type="number" style="padding: 13px;border-radius: 13px 0 0 13px;" step="any" placeholder="135">
+          </div>
+          <div style="flex: 1;">
+            <button class="btn-primary" style="margin-top: 0;border-radius: 0 13px 13px 0;" id="btnAz">计算反方位角</button>
+          </div>
+        </div>
       </div>
-      <button class="btn-primary" id="btnAz">计算反方位角</button>
+      <!-- <button class="btn-primary" id="btnAz">计算反方位角</button> -->
 
       <div class="results" id="azResults"></div>
       <div class="compass-box" id="compassBox1"></div>
 
-      <p class="hint">反方位角 = 原方位角 <b>+ 180°</b>，超过 360° 则减 360°。例：A→B = 135°，则 B→A = 315°。</p>
+      <p class="hint">反方位角 = 原方位角 <b>+ 180°</b>，超过 360° 则减 360°。<br />例：A→B = 135°，则 B→A = 315°。</p>
     </div>
 
     <!-- 模式 B -->
@@ -620,23 +839,32 @@
       </div>
 
       <div class="input-group" style="margin-top:14px">
-        <label>偏转方向（仅基准方向的相邻方向）</label>
+        <!-- <label>偏转方向（仅基准方向的相邻方向）</label> -->
+        <div class="section-title">偏转方向（仅基准方向的相邻方向）</div>
         <div class="segmented" id="offsetDirSeg"></div>
       </div>
 
       <div class="input-group" style="margin-top:12px">
-        <label>偏移角度 (°)</label>
-        <input id="offsetDeg" type="number" step="any" placeholder="20" value="20">
+        <!-- <label>偏移角度 (°)</label> -->
+        <div class="section-title">偏移角度 (°)</div>
+        <div style="display: flex; gap: 0px;">
+          <div style="flex: 1;">
+            <input id="offsetDeg" type="number" style="padding: 13px;border-radius: 13px 0 0 13px;" step="any" placeholder="20" value="20">
+          </div>
+          <div style="flex: 1;">
+            <button class="btn-primary" style="margin-top: 0;border-radius: 0 13px 13px 0;" id="btnOffset">计算方位偏移(角)</button>
+          </div>
+        </div>
       </div>
 
-      <button class="btn-primary" id="btnOffset">计算方位偏移(角)</button>
+      <!-- <button class="btn-primary" id="btnOffset">计算方位偏移(角)</button> -->
       <div class="results" id="offsetResults"></div>
       <div class="compass-box" id="compassBox2"></div>
 
       <p class="hint">
         例：基准 <b>东南</b> 可偏 <b>东</b> 或偏 <b>南</b>；<br />
-        &emsp;&emsp;东南偏南 20° = 135° + 20° = <b>155°</b>，<br />
-        &emsp;&emsp;东南偏东 20° = 135° − 20° = <b>115°</b>。
+        &emsp;&emsp;东南 偏 <b>南</b> 20° = 135° + 20° = <b>155°</b>，<br />
+        &emsp;&emsp;东南 偏 <b>东</b> 20° = 135° − 20° = <b>115°</b>。
       </p>
     </div>
   </section>
@@ -644,19 +872,41 @@
   <!-- ================= 风向换算 ================= -->
   <section class="panel" id="tab-wind">
     <div class="input-group">
-      <label>风向 WD (°)　=　风的来向 / 航向 HD (°)　=　飞机的去向</label>
-      <input id="w_wd" type="number" step="any" placeholder="270">
+      <!-- <label>风向 WD (°)　=　风的来向 / 航向 HD (°)　=　飞机的去向</label> -->
+      <div class="tri-intro">
+        <div style="display: flex;justify-content: space-between;">
+          <span>风向 WD (°)　=　风的来向</span>
+          <span> / </span>
+          <span>航向 HD (°)　=　飞机的去向</span>
+        </div>
+      </div>
+      <!-- <input id="w_wd" type="number" step="any" placeholder="270"> -->
+
+      <div style="display: flex; gap: 0px;">
+        <div style="flex: 1;">
+          <input id="w_wd" type="number" style="padding: 13px;border-radius: 13px 0 0 13px;" step="any" placeholder="输入方位角度数，如：45">
+        </div>
+        <div style="flex: 1;">
+          <button class="btn-primary" style="margin-top: 0;border-radius: 0 13px 13px 0;" id="btnWD2HD">航向换算</button>
+        </div>
+      </div>
     </div>
 
     <div id="wind2">
       <div class="results" id="windAResults"></div>
-      <div class="compass-grid" id="windCompasses"></div>
-
       <p class="hint" style="text-align: center;">
-        <b>风向箭头</b> 从风的来向指向中心，<b>飞机头</b> 指向航向。<!-- <br>
+        <div class="tri-intro" style="display: none;" id="windHint">
+          <div style="display: flex;justify-content: space-between;">
+            <span><b>风向箭头</b> 从风的来向指向中心</span>
+            <span> / </span>
+            <span><b>飞机头</b> 指向航向</span>
+          </div>
+        </div>
+        <!-- <b>风向箭头</b> 从风的来向指向中心，<b>飞机头</b> 指向航向。<br>
         逆风飞行：航向 = 风向　·　顺风飞行：航向 = 风向 ± 180°<br>
         正右侧风：航向 = 风向 − 90°　·　正左侧风：航向 = 风向 + 90° -->
       </p>
+      <div class="compass-grid" id="windCompasses"></div>
     </div>
 
     <button class="btn-primary" style="display: none;" id="btnSave2png">保存</button>
@@ -664,6 +914,31 @@
 
   <!-- ================= 航点 ================= -->
   <section class="panel" id="tab-waypoint">
+    <!-- <div class="input-group">
+      <label>航点管理</label>
+      <div class="tri-intro">航点管理</div>
+    </div> -->
+
+    <!-- <div class="wp-form">
+      <div class="section-title" style="margin-top:16px">航点列表</div>
+    </div> -->
+
+    <!-- <div class="section-title" style="margin-top:22px">
+      添加航点 <span id="wpCount" style="color:var(--accent);font-weight:600"></span>
+    </div>
+
+    <div class="wp-form">
+      <div>暂无航点，请在上方添加</div>
+    </div> -->
+
+    <!-- <div class="section-title" style="margin-top:22px">
+      航点列表 <span id="wpCount" style="color:var(--accent);font-weight:600"></span>
+    </div>
+
+    <div class="wp-list" id="wpList">
+      <div class="wp-empty">暂无航点，请在上方添加</div>
+    </div> -->
+
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
       <defs>
         <style>
@@ -689,129 +964,131 @@
         </style>
       </defs>
     
-      <path d="M 200 200 v 240 m 0 -120 h 200 m 0 -120 v 240" stroke="white" stroke-width="12" stroke-opacity="0.0625" fill="none" />
+      <g transform="translate(150,150) scale(.5)">
+        <path d="M 200 200 v 240 m 0 -120 h 200 m 0 -120 v 240" stroke="white" stroke-width="12" stroke-opacity="0.0625" fill="none" />
 
-      <!-- 背景淡紫色大圆 -->
-      <circle class="bg-circle" cx="300" cy="300" r="250" />
-      <!-- <rect x="30" y="30" width="540" height="540" rx="50" ry="50" fill="#38bdf8" stroke="#2563eb" stroke-width="0" /> -->
-    
-      <!-- 无人机连接臂 (X形) -->
-      <line class="drone-line" x1="260" y1="265" x2="195" y2="210" /> <!-- 左上 -->
-      <line class="drone-line" x1="340" y1="265" x2="405" y2="210" /> <!-- 右上 -->
-      <line class="drone-line" x1="260" y1="335" x2="195" y2="390" /> <!-- 左下 -->
-      <line class="drone-line" x1="340" y1="335" x2="405" y2="390" /> <!-- 右下 -->
-    
-      <!-- 左上螺旋桨 -->
-      <g>
-        <circle cx="190" cy="205" r="50" stroke="#2563eb" stroke-width="6" fill="none" />
-        <line class="drone-blade" x1="160" y1="230" x2="220" y2="180">
-          <animateTransform 
-            attributeName="transform" 
-            attributeType="XML" 
-            type="rotate" 
-            from="0 190 205" 
-            to="360 190 205" 
-            dur="1s" 
-            repeatCount="indefinite" 
-          />
-        </line>
-        <circle cx="190" cy="205" r="8" fill="#2563eb" />
-      </g>
-    
-      <!-- 右上螺旋桨 -->
-      <g>
-        <circle cx="410" cy="205" r="50" stroke="#2563eb" stroke-width="6" fill="none" />
-        <line class="drone-blade" x1="380" y1="180" x2="440" y2="230">
-          <animateTransform 
-            attributeName="transform" 
-            attributeType="XML" 
-            type="rotate" 
-            from="360 410 205" 
-            to="0 410 205" 
-            dur="1s" 
-            repeatCount="indefinite" 
-          />
-        </line>
-        <circle cx="410" cy="205" r="8" fill="#2563eb" />
-      </g>
-    
-      <!-- 左下螺旋桨 -->
-      <g>
-        <circle cx="190" cy="395" r="50" stroke="#2563eb" stroke-width="6" fill="none" />
-        <line class="drone-blade" x1="160" y1="370" x2="220" y2="420">
-          <animateTransform 
+        <!-- 背景淡紫色大圆 -->
+        <circle class="bg-circle" cx="300" cy="300" r="250" />
+        <!-- <rect x="30" y="30" width="540" height="540" rx="50" ry="50" fill="#38bdf8" stroke="#2563eb" stroke-width="0" /> -->
+      
+        <!-- 无人机连接臂 (X形) -->
+        <line class="drone-line" x1="260" y1="265" x2="195" y2="210" /> <!-- 左上 -->
+        <line class="drone-line" x1="340" y1="265" x2="405" y2="210" /> <!-- 右上 -->
+        <line class="drone-line" x1="260" y1="335" x2="195" y2="390" /> <!-- 左下 -->
+        <line class="drone-line" x1="340" y1="335" x2="405" y2="390" /> <!-- 右下 -->
+      
+        <!-- 左上螺旋桨 -->
+        <g>
+          <circle cx="190" cy="205" r="50" stroke="#2563eb" stroke-width="6" fill="none" />
+          <line class="drone-blade" x1="160" y1="230" x2="220" y2="180">
+            <animateTransform 
               attributeName="transform" 
               attributeType="XML" 
               type="rotate" 
-              from="360 190 395" 
-              to="0 190 395" 
+              from="0 190 205" 
+              to="360 190 205" 
               dur="1s" 
               repeatCount="indefinite" 
             />
-        </line>
-        <circle cx="190" cy="395" r="8" fill="#2563eb" />
-      </g>
-    
-      <!-- 右下螺旋桨 -->
-      <g>
-        <circle cx="410" cy="395" r="50" stroke="#2563eb" stroke-width="6" fill="none" />
-        <line class="drone-blade" x1="380" y1="420" x2="440" y2="370">
-          <animateTransform 
-            attributeName="transform" 
-            attributeType="XML" 
-            type="rotate" 
-            from="0 410 395" 
-            to="360 410 395" 
-            dur="1s" 
-            repeatCount="indefinite" 
-          />
-        </line>
-        <circle cx="410" cy="395" r="8" fill="#2563eb" />
-      </g>
-    
-      <!-- 中心机身 (圆角矩形) -->
-      <!-- <rect x="270" y="265" width="60" height="70" rx="10" ry="10" fill="none" stroke="#2563eb" stroke-width="5" /> -->
-      <rect x="260" y="250" width="80" height="100" rx="10" ry="10" fill="none" stroke="#2563eb" stroke-width="5" />
-    
-      <!-- 机身内部的小三角形 -->
-      <!-- <path d="M300,280 l7,15 l-14,0 z" fill="#2563eb" stroke="#2563eb" stroke-width="4" rx="10" ry="10" stroke-linejoin="round" /> -->
-    
-      <!-- 传感器/摄像头小圆点 -->
-      <!-- <circle cx="300" cy="290" r="3" fill="#38bdf8" /> -->
-    
-      <g transform="translate(252,252) scale(4)">
-        <defs>
-          <filter id="breath-glow">
-            <feGaussianBlur stdDeviation="6" result="blur"/>
-            <feFlood flood-color="#ff5a5f" flood-opacity="0.6" result="color"/>
-            <feComposite in="color" in2="blur" operator="over"/>
-            <feMerge>
-              <feMergeNode in="blur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
-        <rect x="4.5" y="2.4" width="15" height="3.4" rx="1" fill="#38bdf8" stroke="#2563eb">
-          <animate attributeName="fill" values="#38bdf8;#2563eb;#38bdf8" dur="1s" repeatCount="indefinite" />
-          <!-- <animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite" /> -->
-        </rect>
-        <circle cx="7.1" cy="9.4" r="1" fill="#2563eb" stroke="none" />
-        <circle cx="12" cy="9.4" r="1" fill="#2563eb" stroke="none" />
-        <circle cx="16.9" cy="9.4" r="1" fill="#2563eb" stroke="none" />
+          </line>
+          <circle cx="190" cy="205" r="8" fill="#2563eb" />
+        </g>
+      
+        <!-- 右上螺旋桨 -->
+        <g>
+          <circle cx="410" cy="205" r="50" stroke="#2563eb" stroke-width="6" fill="none" />
+          <line class="drone-blade" x1="380" y1="180" x2="440" y2="230">
+            <animateTransform 
+              attributeName="transform" 
+              attributeType="XML" 
+              type="rotate" 
+              from="360 410 205" 
+              to="0 410 205" 
+              dur="1s" 
+              repeatCount="indefinite" 
+            />
+          </line>
+          <circle cx="410" cy="205" r="8" fill="#2563eb" />
+        </g>
+      
+        <!-- 左下螺旋桨 -->
+        <g>
+          <circle cx="190" cy="395" r="50" stroke="#2563eb" stroke-width="6" fill="none" />
+          <line class="drone-blade" x1="160" y1="370" x2="220" y2="420">
+            <animateTransform 
+                attributeName="transform" 
+                attributeType="XML" 
+                type="rotate" 
+                from="360 190 395" 
+                to="0 190 395" 
+                dur="1s" 
+                repeatCount="indefinite" 
+              />
+          </line>
+          <circle cx="190" cy="395" r="8" fill="#2563eb" />
+        </g>
+      
+        <!-- 右下螺旋桨 -->
+        <g>
+          <circle cx="410" cy="395" r="50" stroke="#2563eb" stroke-width="6" fill="none" />
+          <line class="drone-blade" x1="380" y1="420" x2="440" y2="370">
+            <animateTransform 
+              attributeName="transform" 
+              attributeType="XML" 
+              type="rotate" 
+              from="0 410 395" 
+              to="360 410 395" 
+              dur="1s" 
+              repeatCount="indefinite" 
+            />
+          </line>
+          <circle cx="410" cy="395" r="8" fill="#2563eb" />
+        </g>
+      
+        <!-- 中心机身 (圆角矩形) -->
+        <!-- <rect x="270" y="265" width="60" height="70" rx="10" ry="10" fill="none" stroke="#2563eb" stroke-width="5" /> -->
+        <rect x="260" y="250" width="80" height="100" rx="10" ry="10" fill="none" stroke="#2563eb" stroke-width="5" />
+      
+        <!-- 机身内部的小三角形 -->
+        <!-- <path d="M300,280 l7,15 l-14,0 z" fill="#2563eb" stroke="#2563eb" stroke-width="4" rx="10" ry="10" stroke-linejoin="round" /> -->
+      
+        <!-- 传感器/摄像头小圆点 -->
+        <!-- <circle cx="300" cy="290" r="3" fill="#38bdf8" /> -->
+      
+        <g transform="translate(252,252) scale(4)">
+          <defs>
+            <filter id="breath-glow">
+              <feGaussianBlur stdDeviation="6" result="blur"/>
+              <feFlood flood-color="#ff5a5f" flood-opacity="0.6" result="color"/>
+              <feComposite in="color" in2="blur" operator="over"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <rect x="4.5" y="2.4" width="15" height="3.4" rx="1" fill="#38bdf8" stroke="#2563eb">
+            <animate attributeName="fill" values="#38bdf8;#2563eb;#38bdf8" dur="1s" repeatCount="indefinite" />
+            <!-- <animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite" /> -->
+          </rect>
+          <circle cx="7.1" cy="9.4" r="1" fill="#2563eb" stroke="none" />
+          <circle cx="12" cy="9.4" r="1" fill="#2563eb" stroke="none" />
+          <circle cx="16.9" cy="9.4" r="1" fill="#2563eb" stroke="none" />
 
-        <circle cx="7.1" cy="15" r="1" fill="#2563eb" stroke="none" />
-        <circle cx="12" cy="15" r="1" fill="#2563eb" stroke="none" />
-        <circle cx="16.9" cy="15" r="1" fill="#2563eb" stroke="none" />
+          <circle cx="7.1" cy="15" r="1" fill="#2563eb" stroke="none" />
+          <circle cx="12" cy="15" r="1" fill="#2563eb" stroke="none" />
+          <circle cx="16.9" cy="15" r="1" fill="#2563eb" stroke="none" />
 
-        <circle cx="7.1" cy="20.6" r="1" fill="#2563eb" stroke="none" />
-        <circle cx="12" cy="20.6" r="1" fill="#2563eb" stroke="none" />
-        <circle cx="16.9" cy="20.6" r="1" fill="#2563eb" stroke="none" />
+          <circle cx="7.1" cy="20.6" r="1" fill="#2563eb" stroke="none" />
+          <circle cx="12" cy="20.6" r="1" fill="#2563eb" stroke="none" />
+          <circle cx="16.9" cy="20.6" r="1" fill="#2563eb" stroke="none" />
+        </g>
       </g>
     </svg>
   </section>
   
   <!-- <p class="footnote">仅用于地面站学习与估算，不可作为唯一飞行依据</p> -->
-  <p class="footnote">仅用于地面站考题的学习与计算 (v0.0.6 / 2026-10-25)</p>
+  <p class="footnote">仅用于地面站考题的学习与计算 (v0.0.8 / 2026-11-01) @zhhh</p>
 </div>
 
 <script>
@@ -1057,7 +1334,7 @@ document.addEventListener('keydown', e => {
 render();
 
 /* ==================== 罗盘绘制（方位角用） ==================== */
-function drawCompass(azDeg, compassBox, cps) {
+function drawCompass2(azDeg, compassBox, cps) {
   const box = $(compassBox);
   const cx = 200, cy = 200, R = 118;
 
@@ -1181,6 +1458,125 @@ function drawCompass(azDeg, compassBox, cps) {
   box.classList.add('show');
 }
 
+function drawCompass(azDeg, compassBox) {
+  const box = $(compassBox || 'compassBox1');
+  const boxId = box.id || 'compassBox1';
+
+  const cx = 200, cy = 200, R = 118;
+  const az  = norm360(azDeg);
+  const rev = norm360(az + 180);
+  const th  = rad(az);
+
+  const ux = Math.sin(th);
+  const uy = -Math.cos(th);
+
+  const p1 = { x: cx + R * ux, y: cy + R * uy };
+  const p2 = { x: cx - R * ux, y: cy - R * uy };
+
+  let nx = -Math.cos(th), ny = -Math.sin(th);
+  if (ny > 0) { nx = -nx; ny = -ny; }
+
+  const off = 16;
+  const t1 = { x: p1.x + nx * off, y: p1.y + ny * off };
+  const t2 = { x: p2.x - nx * off, y: p2.y - ny * off };
+
+  const anchorFor = dx => dx > 0.15 ? 'start' : (dx < -0.15 ? 'end' : 'middle');
+  const anchor1 = anchorFor(nx);
+  const anchor2 = anchorFor(-nx);
+
+  const badgeR = 96;
+  const bBadge = { x: cx + ux * badgeR, y: cy + uy * badgeR };
+  const aBadge = { x: cx - ux * badgeR, y: cy - uy * badgeR };
+
+  /* ★ 用盒子的 id 生成唯一 id，避免两个罗盘同时显示时冲突 */
+  const gradId = 'lineGrad-' + boxId;
+  const glowId = 'glow-' + boxId;
+
+  let ticks = '';
+  for (let i = 0; i < 360; i += 15) {
+    const a = rad(i);
+    const major = i % 45 === 0;
+    const r2 = major ? R - 13 : R - 7;
+    const x1 = cx + R * Math.sin(a),  y1 = cy - R * Math.cos(a);
+    const x2 = cx + r2 * Math.sin(a), y2 = cy - r2 * Math.cos(a);
+    ticks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"
+      stroke="rgba(255,255,255,${major ? '.30' : '.13'})" stroke-width="${major ? 1.6 : 1}" stroke-linecap="round"/>`;
+  }
+
+  const letters = [
+    { t: 'N', a: 0,   c: '#f87171' },
+    { t: 'E', a: 90,  c: '#94a3b8' },
+    { t: 'S', a: 180, c: '#94a3b8' },
+    { t: 'W', a: 270, c: '#94a3b8' }
+  ].map(l => {
+    const a = rad(l.a);
+    const x = cx + (R + 21) * Math.sin(a);
+    const y = cy - (R + 21) * Math.cos(a);
+    return `<text x="${x.toFixed(1)}" y="${(y + 4.5).toFixed(1)}" text-anchor="middle"
+      font-size="13" font-weight="700" fill="${l.c}"
+      font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">${l.t}</text>`;
+  }).join('');
+
+  const cross = (p, color) => `
+    <line x1="${(p.x - 11 - 53).toFixed(1)}" y1="${p.y.toFixed(1)}"
+          x2="${(p.x + 11 + 53).toFixed(1)}" y2="${p.y.toFixed(1)}"
+          stroke="${color}" stroke-width="1.0" stroke-linecap="round" stroke-opacity="0.5" stroke-dasharray="4 2"/>
+    <line x1="${p.x.toFixed(1)}" y1="${(p.y - 11 - 53).toFixed(1)}"
+          x2="${p.x.toFixed(1)}" y2="${(p.y + 11 + 53).toFixed(1)}"
+          stroke="${color}" stroke-width="1.0" stroke-linecap="round" stroke-opacity="0.5" stroke-dasharray="4 2"/>
+    <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="1.0"
+            fill="#0a0f1a" stroke="${color}" stroke-width="1.7"/>
+  `;
+
+  const badge = (p, label, color) => `
+    <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="10"
+            fill="#0a0f1a" stroke="${color || '#fbbf24'}" stroke-width="1.2"/>
+    <text x="${p.x.toFixed(1)}" y="${(p.y + 0.5).toFixed(1)}" text-anchor="middle"
+          dominant-baseline="central" font-size="12" font-weight="800" fill="${color || '#fbbf24'}"
+          font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">${label}</text>
+  `;
+
+  box.innerHTML = `
+  <svg viewBox="0 0 400 400" style="width:100%;height:auto;display:block;max-width:400px;margin:0 auto">
+    <defs>
+      <linearGradient id="${gradId}" gradientUnits="userSpaceOnUse"
+        x1="${p2.x.toFixed(1)}" y1="${p2.y.toFixed(1)}"
+        x2="${p1.x.toFixed(1)}" y2="${p1.y.toFixed(1)}">
+        <stop offset="0%" stop-color="#38bdf8"/>
+        <stop offset="100%" stop-color="#2563eb"/>
+      </linearGradient>
+      <filter id="${glowId}" filterUnits="userSpaceOnUse" x="-50" y="-50" width="500" height="500">
+        <feGaussianBlur stdDeviation="3.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+
+    ${ticks}
+    ${letters}
+
+    ${cross(p1, '#666')}
+    ${cross(p2, '#666')}
+
+    <line x1="${p2.x.toFixed(1)}" y1="${p2.y.toFixed(1)}" x2="${p1.x.toFixed(1)}" y2="${p1.y.toFixed(1)}"
+          stroke="url(#${gradId})" stroke-width="3" stroke-linecap="round" filter="url(#${glowId})"/>
+
+    <circle cx="${p2.x.toFixed(1)}" cy="${p2.y.toFixed(1)}" r="3.5" fill="#38bdf8"/>
+    <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="3.5" fill="#2563eb"/>
+
+    ${badge(bBadge, 'B', '#2563eb')}
+    ${badge(aBadge, 'A', '#38bdf8')}
+
+    <text x="${t1.x.toFixed(1)}" y="${t1.y.toFixed(1)}" text-anchor="${anchor1}"
+          dominant-baseline="middle" font-size="13" font-weight="700" fill="#2563eb"
+          font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">B-A = ${fmtAngle(rev)}°</text>
+    <text x="${t2.x.toFixed(1)}" y="${t2.y.toFixed(1)}" text-anchor="${anchor2}"
+          dominant-baseline="middle" font-size="13" font-weight="700" fill="#38bdf8"
+          font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">A-B = ${fmtAngle(az)}°</text>
+  </svg>`;
+
+  box.classList.add('show');
+}
+
 const segs = document.querySelectorAll('#tab-bearing > .segmented > .seg')
 segs.forEach(seg => {
     seg.addEventListener('click', () => {
@@ -1213,6 +1609,7 @@ $('btnAz').addEventListener('click', () => {
   ]);
   localStorage.setItem("az", JSON.stringify({az: a, rev: rev}));
 });
+
 let azrs = localStorage.getItem("az");
 // console.log('azr', azrs);
 
@@ -1365,8 +1762,9 @@ function buildWindCompass(wd, hdg, label, formula) {
         <circle cx="${cx}" cy="${cy}" r="1.6" fill="#0a0f1a"/>
       </svg>
       <div class="mini-label">${label}</div>
-      <div class="mini-value">航向 = ${fmtAngle(hdg)}°</div>
-      <div class="mini-formula">${formula}</div>
+      <div class="mini-value">${formula} = ${fmtAngle(hdg)}°</div>
+      <!-- <div class="mini-value">航向 = ${formula} = ${fmtAngle(hdg)}°</div>
+      <div class="mini-formula">${formula}</div> -->
     </div>
   `;
 }
@@ -1400,39 +1798,71 @@ function renderWind(wd) {
   $('windCompasses').innerHTML = compasses
     .map(c => buildWindCompass(w, c.hdg, c.label, c.formula))
     .join('');
+  // $('windHint').style.display = 'block';
 
   renderResults('windAResults', [
     { k: '风向 WD', v: fmt(w, 1) + '°' },
-    { k: '逆风飞行 &emsp;→ 航向 = 风向(' + w + '°)', v: fmt(h_head, 1) + '°', cls: 'hl' },
-    { k: '顺风飞行 &emsp;→ 航向 = 风向(' + w + '°) ± 180° = ', v: fmt(h_tail, 1) + '°', cls: 'hl' },
-    { k: '正左侧风 &emsp;→ 航向 = 风向(' + w + '°) + 90° &ensp;= ', v: fmt(h_left, 1) + '°', cls: 'hl' },
-    { k: '正右侧风 &emsp;→ 航向 = 风向(' + w + '°) - 90° &ensp;= ', v: fmt(h_right, 1) + '°', cls: 'hl' },
+    // { k: '风向箭头 从风的来向指向中心', v: '飞机头 指向航向', cls: 'hl' },
+    { k: '风向 WD', v: '箭头从风的来向指向中心', cls: 'hl' },
+    { k: '航向 HD', v: '飞机头朝向', cls: 'hl' },
+    // { k: '逆风飞行 &emsp;→ 航向 = 风向(' + w + '°)', v: fmt(h_head, 1) + '°', cls: 'hl' },
+    // { k: '顺风飞行 &emsp;→ 航向 = 风向(' + w + '°) ± 180° = ', v: fmt(h_tail, 1) + '°', cls: 'hl' },
+    // { k: '正左侧风 &emsp;→ 航向 = 风向(' + w + '°) + 90° &ensp;= ', v: fmt(h_left, 1) + '°', cls: 'hl' },
+    // { k: '正右侧风 &emsp;→ 航向 = 风向(' + w + '°) - 90° &ensp;= ', v: fmt(h_right, 1) + '°', cls: 'hl' },
 
-    { k: '正左前侧风 → 航向 = 风向(' + w + '°) + 45° &ensp;= ', v: fmt(h_left_front, 1) + '°', cls: 'hl' },
-    { k: '正右前侧风 → 航向 = 风向(' + w + '°) - 45° &ensp;= ', v: fmt(h_right_front, 1) + '°', cls: 'hl' },
-    { k: '正左后侧风 → 航向 = 风向(' + w + '°) + 135° = ', v: fmt(h_left_back, 1) + '°', cls: 'hl' },
-    { k: '正右后侧风 → 航向 = 风向(' + w + '°) - 135° = ', v: fmt(h_right_back, 1) + '°', cls: 'hl' }
+    // { k: '正左前侧风 → 航向 = 风向(' + w + '°) + 45° &ensp;= ', v: fmt(h_left_front, 1) + '°', cls: 'hl' },
+    // { k: '正右前侧风 → 航向 = 风向(' + w + '°) - 45° &ensp;= ', v: fmt(h_right_front, 1) + '°', cls: 'hl' },
+    // { k: '正左后侧风 → 航向 = 风向(' + w + '°) + 135° = ', v: fmt(h_left_back, 1) + '°', cls: 'hl' },
+    // { k: '正右后侧风 → 航向 = 风向(' + w + '°) - 135° = ', v: fmt(h_right_back, 1) + '°', cls: 'hl' }
   ]);
 }
 
-$('w_wd').addEventListener('input', () => {
+/* $('w_wd').addEventListener('input', () => {
   const wd = parseFloat($('w_wd').value);
   if (!isFinite(wd)) {
     $('windCompasses').innerHTML = '';
     $('windAResults').innerHTML = '';
+    $('windHint').style.display = 'none';
     showSaveButton(false);
     return;
   }
   showSaveButton(true);
   renderWind(wd);
+}); */
+
+$('btnWD2HD').addEventListener('click', () => {
+  const wd = parseFloat($('w_wd').value);
+  if (!isFinite(wd)) {
+    $('windCompasses').innerHTML = '';
+    $('windAResults').innerHTML = '';
+    $('windHint').style.display = 'none';
+    renderResults('windAResults', [{ k: '提示', v: '请输入有效的风向方位角', cls: 'err' }]);
+    showSaveButton(false);
+    return;
+  }
+  showSaveButton(true);
+  renderWind(wd);
+
+  localStorage.setItem("wd", JSON.stringify({val: wd}));
 });
 
 $('w_wd').addEventListener('keydown', e => {
   if (e.key === 'Enter') {
-    const wd = parseFloat($('w_wd').value);
-    if (isFinite(wd)) renderWind(wd);
+    // const wd = parseFloat($('w_wd').value);
+    // if (isFinite(wd)) renderWind(wd);
+    $('btnWD2HD').click();
   }
 });
+
+try {
+  let wds = localStorage.getItem("wd");
+  if(wds) {
+    let wdv = JSON.parse(wds);
+    $('w_wd').value = wdv.val;
+  }
+} catch (error) {
+  console.log('wd', error);
+}
 
 if ($('w_wd').value) {
   const wd = parseFloat($('w_wd').value);
@@ -1520,17 +1950,31 @@ const TRIANGLES = [
     desc: '两直角边相等，斜边 = 直角边 × √2，直角边 = 斜边 &divide; √2',
     svg: TRI_SVG.iso45,
     options: [
-      { v: 'a', label: '已知直角边 a' },
-      { v: 'c', label: '已知斜边 c' }
+      { v: 'a', label: '直角边 a' },
+      { v: 'c', label: '斜边 c' }
     ],
     calc(val, opt) {
-      let a, c;
-      if (opt === 'a') { a = val; c = a * Math.SQRT2; }
-      else             { c = val; a = c / Math.SQRT2; }
+      let a, c, h, fa, fc, fh;
+      if (opt === 'a') { 
+        a = val; 
+        c = a * Math.SQRT2; 
+        h = c / 2;
+        fa = '';
+        fc = a + ' x √2 =';
+        fh = a + ' x √2 ÷ 2 =';
+      } else { 
+        c = val; 
+        a = c / Math.SQRT2; 
+        h = c / 2;
+        fa = c + ' ÷ √2 =';
+        fc = '';
+        fh = c + ' ÷ 2 =';
+      }
       return [
-        { k: '直角边 a', v: fmtTri(a) },
-        { k: '直角边 b', v: fmtTri(a) },
-        { k: '斜边 c', v: fmtTri(c) }
+        { k: '直角边 a', v: fmtTri(a), f:fa },
+        { k: '直角边 b', v: fmtTri(a), f:fa },
+        { k: '斜边 c', v: fmtTri(c), f:fc },
+        { k: '斜边上的高 h', v: fmtTri(h), f:fh }
       ];
     }
   },
@@ -1540,20 +1984,32 @@ const TRIANGLES = [
     badge: '30° - 60° - 90° / 1 : √3 : 2',
     desc: '俗称“369”三角形。短直角边对 30°，长直角边对 60°，斜边 = 2 × 短直角边',
     svg: TRI_SVG.tri369,
+    /*options: [
+      { v: 'a', label: '短直角边（对30°）' },
+      { v: 'b', label: '长直角边（对60°）' },
+      { v: 'c', label: '斜边' }
+    ],*/
     options: [
-      { v: 'a', label: '已知短直角边（对30°）' },
-      { v: 'b', label: '已知长直角边（对60°）' },
-      { v: 'c', label: '已知斜边' }
+      { v: 'a', label: '短直角边 a（对30°）' },
+      { v: 'b', label: '长直角边 b（对60°）' },
+      { v: 'c', label: '斜边 c' }
     ],
     calc(val, opt) {
-      let a, b, c;
-      if (opt === 'a')      { a = val; b = a * Math.sqrt(3); c = 2 * a; }
-      else if (opt === 'b') { b = val; a = b / Math.sqrt(3); c = 2 * a; }
-      else                  { c = val; a = c / 2; b = a * Math.sqrt(3); }
+      let a, b, c, fa, fb, fc;
+      if (opt === 'a')      { 
+        a = val; b = a * Math.sqrt(3); c = 2 * a;
+        fa = ''; fb = a + ' x √3 ='; fc = a + ' x 2 =';
+      } else if (opt === 'b') { 
+        b = val; a = b / Math.sqrt(3); c = 2 * a; 
+        fa = b + ' ÷ √3 ='; fb = ''; fc = b + ' ÷ √3 x 2 =';
+      } else                  { 
+        c = val; a = c / 2; b = a * Math.sqrt(3); 
+        fa = c + ' ÷ 2 ='; fb = c + ' ÷ 2 x √3 ='; fc = '';
+      }
       return [
-        { k: '短直角边（对30°）', v: fmtTri(a) },
-        { k: '长直角边（对60°）', v: fmtTri(b) },
-        { k: '斜边', v: fmtTri(c) }
+        { k: '短直角边 a（对30°）', v: fmtTri(a), f: fa },
+        { k: '长直角边 b（对60°）', v: fmtTri(b), f: fb },
+        { k: '斜边 c', v: fmtTri(c), f: fc }
       ];
     }
   },
@@ -1564,19 +2020,26 @@ const TRIANGLES = [
     desc: '三边比为 3 : 4 : 5，直角在 3 与 4 两条直角边之间',
     svg: TRI_SVG.tri345,
     options: [
-      { v: 'a', label: '已知短直角边（3k）' },
-      { v: 'b', label: '已知长直角边（4k）' },
-      { v: 'c', label: '已知斜边（5k）' }
+      { v: 'a', label: '短直角边（3k）' },
+      { v: 'b', label: '长直角边（4k）' },
+      { v: 'c', label: '斜边（5k）' }
     ],
     calc(val, opt) {
-      let a, b, c;
-      if (opt === 'a')      { a = val; b = 4 * val / 3; c = 5 * val / 3; }
-      else if (opt === 'b') { b = val; a = 3 * val / 4; c = 5 * val / 4; }
-      else                  { c = val; a = 3 * val / 5; b = 4 * val / 5; }
+      let a, b, c, fa, fb, fc;
+      if (opt === 'a')      { 
+        a = val; b = 4 * val / 3; c = 5 * val / 3; 
+        fa = ''; fb = a + ' ÷ 3 x 4 ='; fc = fc = a + ' ÷ 3 x 5 =';
+      } else if (opt === 'b') { 
+        b = val; a = 3 * val / 4; c = 5 * val / 4; 
+        fa = b + ' ÷ 4 x 3 ='; fb = ''; fc = b + ' ÷ 4 x 5 =';
+      } else                  { 
+        c = val; a = 3 * val / 5; b = 4 * val / 5; 
+        fa = c + ' ÷ 5 x 3 ='; fb = c + ' ÷ 5 x 4 ='; fc = '';
+      }
       return [
-        { k: '短直角边（3k）', v: fmtTri(a) },
-        { k: '长直角边（4k）', v: fmtTri(b) },
-        { k: '斜边（5k）', v: fmtTri(c) }
+        { k: '短直角边（3k）', v: fmtTri(a), f: fa },
+        { k: '长直角边（4k）', v: fmtTri(b), f: fb },
+        { k: '斜边（5k）', v: fmtTri(c), f: fc }
       ];
     }
   },
@@ -1587,19 +2050,24 @@ const TRIANGLES = [
     desc: '两腰相等，顶角 120°，底角各 30°。底边 = 腰 × √3，高 = 腰 ÷ 2',
     svg: TRI_SVG.tri120iso,
     options: [
-      { v: 'l', label: '已知腰长 l' },
-      { v: 'b', label: '已知底边 b' }
+      { v: 'l', label: '腰长 l' },
+      { v: 'b', label: '底边 b' }
     ],
     calc(val, opt) {
       const S3 = Math.sqrt(3);
-      let l, b;
-      if (opt === 'l') { l = val; b = l * S3; }
-      else             { b = val; l = b / S3; }
+      let l, b, fl, fb, fh;
+      if (opt === 'l') { 
+        l = val; b = l * S3; 
+        fl = ''; fb = l + ' x √3 ='; fh = l + ' ÷ 2 =';
+      } else { 
+        b = val; l = b / S3; 
+        fl = b + ' ÷ √3 ='; fb = ''; fh = b + ' ÷ √3 ÷ 2 =';
+      }
       const h = l / 2;
       return [
-        { k: '腰长 l', v: fmtTri(l) },
-        { k: '底边 b', v: fmtTri(b) },
-        { k: '高 h', v: fmtTri(h) }
+        { k: '腰长 l', v: fmtTri(l), f: fl },
+        { k: '底边 b', v: fmtTri(b), f: fb },
+        { k: '高 h', v: fmtTri(h), f: fh }
       ];
     }
   },
@@ -1610,8 +2078,8 @@ const TRIANGLES = [
     desc: '两腰相等，顶角 30°，底角各 75°。常用于航向变化 30° 时的位移估算',
     svg: TRI_SVG.tri30iso,
     options: [
-      { v: 'l', label: '已知腰长 l' },
-      { v: 'b', label: '已知底边 b' }
+      { v: 'l', label: '腰长 l' },
+      { v: 'b', label: '底边 b' }
     ],
     calc(val, opt) {
       const sin15 = Math.sin(rad(15));
@@ -1621,9 +2089,9 @@ const TRIANGLES = [
       else             { b = val; l = b / (2 * sin15); }
       const h = l * cos15;
       return [
-        { k: '腰长 l', v: fmtTri(l) },
-        { k: '底边 b', v: fmtTri(b) },
-        { k: '高 h', v: fmtTri(h) }
+        { k: '腰长 l', v: fmtTri(l), f: '' },
+        { k: '底边 b', v: fmtTri(b), f: '' },
+        { k: '高 h', v: fmtTri(h), f: '' }
       ];
     }
   }
@@ -1641,18 +2109,37 @@ function buildTriCards() {
         </div>
       </div>
       <p class="tri-desc">${t.desc}</p>
+      <!--
       <div class="tri-input-row">
         <select class="tri-select" data-tri="${t.id}">
           ${t.options.map(o => `<option value="${o.v}">${o.label}</option>`).join('')}
         </select>
         <input class="tri-input" type="number" step="any" min="0" placeholder="输入长度" data-tri="${t.id}">
       </div>
+      -->
+      <div style="display:flex; gap: 8px;">
+        <span style="width: 64px; line-height: 40px; padding-left: 8px;">已知</span>
+        <div style="flex:1;">
+          <div class="tri-option-row" data-tri="${t.id}">
+            ${t.options.map((o, i) => `
+              <input type="radio" name="tri-${t.id}" id="tri-${t.id}-${o.v}"
+                    value="${o.v}"${i === 0 ? ' checked' : ''}>
+              <label for="tri-${t.id}-${o.v}" class="tri-option">${o.label}</label>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap: 8px;">
+        <span style="width: 64px; line-height: 40px; padding-left: 8px;">边长</span>
+        <input class="tri-input" style="flex:1;" type="number" step="any" min="0" placeholder="输入长度" data-tri="${t.id}">
+      </div>
       <div class="tri-results" id="res-${t.id}"></div>
     </div>
   `).join('');
 
   TRIANGLES.forEach(t => {
-    const input = wrap.querySelector(`.tri-input[data-tri="${t.id}"]`);
+    /*const input = wrap.querySelector(`.tri-input[data-tri="${t.id}"]`);
     const select = wrap.querySelector(`.tri-select[data-tri="${t.id}"]`);
     const resBox = $(`res-${t.id}`);
 
@@ -1672,7 +2159,30 @@ function buildTriCards() {
     };
 
     input.addEventListener('input', update);
-    select.addEventListener('change', update);
+    select.addEventListener('change', update);*/
+
+    const input = wrap.querySelector(`.tri-input[data-tri="${t.id}"]`);
+    const resBox = $(`res-${t.id}`);
+    const row = wrap.querySelector(`.tri-option-row[data-tri="${t.id}"]`);
+    const radios = [...row.querySelectorAll('input[type="radio"]')];
+
+    const update = () => {
+      const val = parseFloat(input.value);
+      if (!isFinite(val) || val <= 0) { resBox.innerHTML = ''; return; }
+      const checked = row.querySelector('input[type="radio"]:checked');
+      const opt = checked ? checked.value : t.options[0].v;
+      const results = t.calc(val, opt);
+      resBox.innerHTML = results.map(r => `
+        <div class="tri-res">
+          <span class="k">${r.k}</span>
+          <span class="f">${r.f}</span>
+          <span class="v">${r.v}</span>
+        </div>
+      `).join('');
+    };
+
+    radios.forEach(r => r.addEventListener('change', update));
+    input.addEventListener('input', update);
   });
 }
 buildTriCards();
@@ -1805,47 +2315,50 @@ async function saveImage(invoke, img, filename = 'image.png', scale = 2) {
   // Uncaught (in promise) Command plugin:app|set_dock_visibility not allowed by ACL
 }
 
+const debug = false;
 /* */
 window.addEventListener('DOMContentLoaded', () => {
-  const script = document.createElement('script');
-  script.src = 'https://unpkg.com/@zumer/snapdom@latest/dist/snapdom.js';
-  script.onload = () => {
-    // console.log('SnapDOM 脚本加载完成', window.snapdom);
+  if (debug && debug === true) {
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/@zumer/snapdom@latest/dist/snapdom.js';
+    script.onload = () => {
+      // console.log('SnapDOM 脚本加载完成', window.snapdom);
 
-    if (typeof window.snapdom !== 'undefined') {
-      console.log('SnapDOM 已加载');
-      // $('btnSave2png').style.setProperty("display", 'block');
-      $('btnSave2png').addEventListener('click', async () => {
-        const wind2 = document.getElementById('wind2'), 
-          pd = "8px 20px 20px 20px",
-          bg = "radial-gradient(circle at 20% -10%, #12304a 0%, #0a0f1a 45%, #05070c 100%)";
+      if (typeof window.snapdom !== 'undefined') {
+        console.log('SnapDOM 已加载');
+        // $('btnSave2png').style.setProperty("display", 'block');
+        $('btnSave2png').addEventListener('click', async () => {
+          const wind2 = document.getElementById('wind2'), 
+            pd = "8px 20px 20px 20px",
+            bg = "radial-gradient(circle at 20% -10%, #12304a 0%, #0a0f1a 45%, #05070c 100%)";
 
-          wind2.style.setProperty("padding", pd);
-          wind2.style.setProperty("background", bg);
+            wind2.style.setProperty("padding", pd);
+            wind2.style.setProperty("background", bg);
 
-        if ('__TAURI__' in window) {
-          const { invoke, checkPermissions, requestPermissions } = window.__TAURI__.core;
-          if (invoke) {
-            // if (checkPermissions("writeFile")) {
-            //   console.log("writeFile");
-            // }
-            // requestPermissions("writeFile");
-            const image = await snapdom.toPng(wind2, {scale: 2});
-            saveImage(invoke, image, 'drone.png');
+          if ('__TAURI__' in window) {
+            const { invoke, checkPermissions, requestPermissions } = window.__TAURI__.core;
+            if (invoke) {
+              // if (checkPermissions("writeFile")) {
+              //   console.log("writeFile");
+              // }
+              // requestPermissions("writeFile");
+              const image = await snapdom.toPng(wind2, {scale: 2});
+              saveImage(invoke, image, 'drone.png');
+            }
+          } else {
+            snapdom.download(wind2, {scale: 2, format: 'png', filename: 'drone.png' })
+              .then(() => {
+                wind2.style.setProperty("background", null);
+                wind2.style.setProperty("padding", null);
+                console.log('下载完成');
+              })
+              .catch(err => console.error('下载失败', err));
           }
-        } else {
-          snapdom.download(wind2, {scale: 2, format: 'png', filename: 'drone.png' })
-            .then(() => {
-              wind2.style.setProperty("background", null);
-              wind2.style.setProperty("padding", null);
-              console.log('下载完成');
-            })
-            .catch(err => console.error('下载失败', err));
-        }
-      });
-    }
-  };
-  document.head.appendChild(script);
+        });
+      }
+    };
+    document.head.appendChild(script);
+  }
 });
 
 function showSaveButton(show) {
