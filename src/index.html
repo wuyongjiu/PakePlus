@@ -661,6 +661,355 @@
   }
   .wp-card-val.rev .v { color: #60a5fa; }
 
+  /* ===== 计时管理 ===== */
+  .timer-card {
+    background: rgba(255,255,255,.045);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 16px 16px 18px;
+  }
+
+  .timer-preset-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: 16px;
+  }
+
+  .timer-preset-row input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0; height: 0;
+    margin: 0;
+    pointer-events: none;
+  }
+
+  .timer-preset-row label.timer-preset {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 46px;
+    border: 1px solid rgba(255,255,255,.11);
+    border-right: none;
+    background: rgba(0,0,0,.32);
+    color: var(--muted);
+    font-size: 14px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    letter-spacing: .3px;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  .timer-preset-row label.timer-preset:first-of-type {
+    border-radius: 12px 0 0 12px;
+  }
+  .timer-preset-row label.timer-preset:last-of-type {
+    border-radius: 0 12px 12px 0;
+    border-right: 1px solid rgba(255,255,255,.11);
+  }
+
+  .timer-preset-row label.timer-preset:hover {
+    background: rgba(255,255,255,.07);
+    color: #e6edf6;
+  }
+
+  .timer-preset-row input[type="radio"]:checked + label.timer-preset {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff;
+    font-weight: 700;
+    border-color: transparent;
+  }
+
+  .timer-preset-row input[type="radio"]:focus-visible + label.timer-preset {
+    outline: 2px solid rgba(56,189,248,.55);
+    outline-offset: -2px;
+  }
+
+  .timer-face {
+    background: rgba(0,0,0,.38);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px 16px 18px;
+    text-align: center;
+    margin-bottom: 16px;
+    box-shadow: inset 0 2px 18px rgba(0,0,0,.4);
+  }
+
+  .timer-digits {
+    font-size: 46px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+    color: var(--accent);
+    transition: color .2s;
+  }
+  .timer-digits.overtime {
+    color: #fbbf24;
+  }
+  .timer-digits.paused {
+    opacity: .55;
+  }
+
+  .timer-status {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: 1px;
+    height: 16px;
+  }
+
+  .timer-btns {
+    display: flex;
+    gap: 8px;
+  }
+  .timer-btns button {
+    flex: 1;
+    height: 52px;
+    border-radius: 13px;
+    cursor: pointer;
+    transition: .15s;
+    -webkit-tap-highlight-color: transparent;
+    border: none;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .timer-btns button:active { transform: scale(.97); }
+  .timer-btns button:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .timer-btns button svg {
+    width: 22px;
+    height: 22px;
+    display: block;
+  }
+
+  .timer-btn-start {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    box-shadow: 0 4px 16px rgba(56,189,248,.28);
+  }
+  .timer-btn-start:hover:not(:disabled) { filter: brightness(1.08); }
+
+  .timer-btn-pause {
+    background: rgba(251,191,36,.16);
+    border: 1px solid rgba(251,191,36,.35);
+    color: #fbbf24;
+  }
+  .timer-btn-pause:hover:not(:disabled) { background: rgba(251,191,36,.26); }
+
+  .timer-btn-resume {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    box-shadow: 0 4px 16px rgba(56,189,248,.28);
+  }
+  .timer-btn-resume:hover:not(:disabled) { filter: brightness(1.08); }
+
+  .timer-btn-stop {
+    background: rgba(248,113,113,.14);
+    border: 1px solid rgba(248,113,113,.32);
+    color: #f87171;
+  }
+  .timer-btn-stop:hover:not(:disabled) { background: rgba(248,113,113,.24); }
+
+  .timer-btn-done {
+  background: rgba(52,211,153,.14);
+  border: 1px solid rgba(52,211,153,.32);
+  color: #34d399;
+}
+.timer-btn-done:hover:not(:disabled) { background: rgba(52,211,153,.24); }
+
+  .timer-list-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 22px 0 10px;
+  }
+  .timer-list-title {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+  /* .timer-clear-btn {
+    height: 28px;
+    padding: 0 12px;
+    border: 1px solid rgba(248,113,113,.28);
+    border-radius: 8px;
+    background: rgba(248,113,113,.08);
+    color: #f87171;
+    font-size: 11.5px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: .15s;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .timer-clear-btn:hover { background: rgba(248,113,113,.18); }
+  .timer-clear-btn:active { transform: scale(.96); }
+  .timer-clear-btn:disabled { opacity: .35; cursor: not-allowed; transform: none; } */
+
+  .timer-clear-btn {
+    width: 44px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid rgba(248,113,113,.28);
+    border-radius: 8px;
+    background: rgba(248,113,113,.08);
+    color: #f87171;
+    font-family: inherit;
+    cursor: pointer;
+    transition: .15s;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+  }
+  .timer-clear-btn svg { width: 16px; height: 16px; display: block; }
+  .timer-clear-btn:hover { background: rgba(248,113,113,.18); }
+  .timer-clear-btn:active { transform: scale(.96); }
+  .timer-clear-btn:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+
+  .timer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .timer-record {
+    background: rgba(255,255,255,.045);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 13px;
+    padding: 11px 13px;
+  }
+  .timer-record.overtime {
+    border-left-color: #fbbf24;
+  }
+
+  .timer-record-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .timer-record-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #e6edf6;
+  }
+  .timer-record-title .preset-tag {
+    display: inline-block;
+    font-size: 10.5px;
+    color: var(--accent);
+    background: rgba(56,189,248,.12);
+    border: 1px solid rgba(56,189,248,.25);
+    padding: 1px 6px;
+    border-radius: 5px;
+    margin-left: 6px;
+    font-weight: 600;
+    vertical-align: middle;
+  }
+  .timer-record.overtime .timer-record-title .preset-tag {
+    color: #fbbf24;
+    background: rgba(251,191,36,.1);
+    border-color: rgba(251,191,36,.25);
+  }
+  /* .timer-record-del {
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.06);
+    color: var(--muted);
+    border-radius: 7px;
+    padding: 3px 9px;
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: .15s;
+    flex: 0 0 auto;
+  }
+  .timer-record-del:hover {
+    background: rgba(248,113,113,.15);
+    color: #f87171;
+    border-color: rgba(248,113,113,.3);
+  } */
+  .timer-record-del {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.06);
+    color: var(--muted);
+    border-radius: 7px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: .15s;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .timer-record-del svg { width: 15px; height: 15px; display: block; }
+  .timer-record-del:hover {
+    background: rgba(248,113,113,.15);
+    color: #f87171;
+    border-color: rgba(248,113,113,.3);
+  }
+  .timer-record-del:active { transform: scale(.94); }
+
+  .timer-record-vals {
+    display: flex;
+    gap: 8px;
+  }
+
+  .timer-record-val {
+    flex: 1;
+    min-width: 0;
+    background: rgba(0,0,0,.22);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 9px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .timer-record-val .k {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .timer-record-val .v {
+    font-size: 16px;
+    font-weight: 650;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    flex: 0 0 auto;
+  }
+  .timer-record.overtime .timer-record-val.over .v {
+    color: #fbbf24;
+  }
+  .timer-record-val.over .v { color: #34d399; }
+
+  .timer-empty {
+    text-align: center;
+    font-size: 12px;
+    color: #4a5b70;
+    padding: 28px 0;
+    border: 1px dashed var(--line);
+    border-radius: 14px;
+  }
+
   .footnote {
     text-align: center; font-size: 11px; color: #3f4d5e;
     margin-top: 26px; letter-spacing: .4px;
@@ -726,11 +1075,22 @@
       </svg>
       <!-- <span class="tab-text">风向换算</span> -->
     </button>
+
     <button class="tab" data-tab="waypoint" title="航点管理" aria-label="航点管理">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="6" cy="18" r="2.6"/>
         <circle cx="18" cy="6" r="2.6"/>
         <line x1="8.2" y1="15.8" x2="15.8" y2="8.2" />
+      </svg>
+    </button>
+
+    <button class="tab" data-tab="timer" title="计时管理">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="13" r="8"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="13" x2="15" y2="15"/>
+        <line x1="9" y1="2" x2="15" y2="2"/>
+        <line x1="12" y1="2" x2="12" y2="5"/>
       </svg>
     </button>
   </nav>
@@ -819,11 +1179,11 @@
       <div class="section-title">方位</div>
 
       <div class="dir-picker" id="dirPicker">
-        <button type="button" class="dir-btn" data-dir="315">西北 NW</button>
-        <button type="button" class="dir-btn" data-dir="0">北 N</button>
-        <button type="button" class="dir-btn" data-dir="45">东北 NE</button>
+        <button type="button" class="dir-btn" data-dir="315">西北 NW 315°</button>
+        <button type="button" class="dir-btn" data-dir="0">北 N 0°</button>
+        <button type="button" class="dir-btn" data-dir="45">东北 NE 45°</button>
 
-        <button type="button" class="dir-btn" data-dir="270">西 W</button>
+        <button type="button" class="dir-btn" data-dir="270">西 W 270°</button>
         <!-- <div class="dir-center">✈</div> -->
         <div class="dir-center">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px">
@@ -831,11 +1191,11 @@
             <circle cx="12" cy="10" r="2.5"/>
           </svg>
         </div>
-        <button type="button" class="dir-btn" data-dir="90">东 E</button>
+        <button type="button" class="dir-btn" data-dir="90">东 E 90°</button>
 
-        <button type="button" class="dir-btn" data-dir="225">西南 SW</button>
-        <button type="button" class="dir-btn" data-dir="180">南 S</button>
-        <button type="button" class="dir-btn" data-dir="135">东南 SE</button>
+        <button type="button" class="dir-btn" data-dir="225">西南 SW 225°</button>
+        <button type="button" class="dir-btn" data-dir="180">南 S 180°</button>
+        <button type="button" class="dir-btn" data-dir="135">东南 SE 135°</button>
       </div>
 
       <div class="input-group" style="margin-top:14px">
@@ -884,7 +1244,8 @@
 
       <div style="display: flex; gap: 0px;">
         <div style="flex: 1;">
-          <input id="w_wd" type="number" style="padding: 13px;border-radius: 13px 0 0 13px;" step="any" placeholder="输入方位角度数，如：45">
+          <!-- <input id="w_wd" type="number" style="padding: 13px;border-radius: 13px 0 0 13px;" step="any" placeholder="输入方位角度数，如：45"> -->
+          <input id="w_wd" type="text" autocomplete="off" spellcheck="false" style="padding: 13px;border-radius: 13px 0 0 13px;" placeholder="输入方位角或方位，如 45 / NE">
         </div>
         <div style="flex: 1;">
           <button class="btn-primary" style="margin-top: 0;border-radius: 0 13px 13px 0;" id="btnWD2HD">航向换算</button>
@@ -931,13 +1292,31 @@
       <div>暂无航点，请在上方添加</div>
     </div> -->
 
-    <!-- <div class="section-title" style="margin-top:22px">
+    <div class="section-title" style="margin-top:22px">
       航点列表 <span id="wpCount" style="color:var(--accent);font-weight:600"></span>
     </div>
 
     <div class="wp-list" id="wpList">
-      <div class="wp-empty">暂无航点，请在上方添加</div>
-    </div> -->
+      <!-- <div class="wp-empty">暂无航点，请在上方添加</div> -->
+      <!-- <div class="wp-empty">暂无航点</div> -->
+
+      <div class="tri-intro">
+        <div>
+          <div style="display: flex; gap: 12px;">
+            <span>起飞点 H</span>
+            <span style="flex: 1;"><b>在</b>、<b>位于</b></span>
+            <span style="flex: 2;">避让点 B ... </span>
+            <span>= B → H</span>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <span>起飞点 H</span>
+            <span style="flex: 1;"><b>到</b>、<b>前往</b>、<b>飞往</b></span>
+            <span style="flex: 2;">避让点 B ... </span>
+            <span>= H → B</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
       <defs>
@@ -964,7 +1343,7 @@
         </style>
       </defs>
     
-      <g transform="translate(150,150) scale(.5)">
+      <g transform="translate(150,75) scale(.5)">
         <path d="M 200 200 v 240 m 0 -120 h 200 m 0 -120 v 240" stroke="white" stroke-width="12" stroke-opacity="0.0625" fill="none" />
 
         <!-- 背景淡紫色大圆 -->
@@ -1086,9 +1465,81 @@
       </g>
     </svg>
   </section>
+
+  <section class="panel" id="tab-timer">
+    <div class="timer-card">
+      <div class="timer-preset-row" id="timerPresetRow">
+        <input type="radio" name="timer-preset" id="timer-preset-6" value="360" checked>
+        <label for="timer-preset-6" class="timer-preset">6 分钟</label>
+        <input type="radio" name="timer-preset" id="timer-preset-2" value="120">
+        <label for="timer-preset-2" class="timer-preset">2 分钟</label>
+        <input type="radio" name="timer-preset" id="timer-preset-1" value="60">
+        <label for="timer-preset-1" class="timer-preset">1 分钟</label>
+      </div>
+
+      <div class="timer-face">
+        <div class="timer-digits" id="timerDigits">06:00</div>
+        <div class="timer-status" id="timerStatus">准备做题</div>
+      </div>
+
+      <!-- <div class="timer-btns">
+        <button type="button" class="timer-btn-start" id="btnTimerStart">开始</button>
+        <button type="button" class="timer-btn-pause" id="btnTimerPause" style="display:none">暂停</button>
+        <button type="button" class="timer-btn-resume" id="btnTimerResume" style="display:none">继续</button>
+        <button type="button" class="timer-btn-stop" id="btnTimerStop" style="display:none">停止</button>
+      </div> -->
+      <div class="timer-btns">
+        <button type="button" class="timer-btn-start" id="btnTimerStart" aria-label="开始" title="开始">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <polygon points="7,4 21,12 7,20"/>
+          </svg>
+        </button>
+        <button type="button" class="timer-btn-pause" id="btnTimerPause" style="display:none" aria-label="暂停" title="暂停">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <rect x="6" y="4" width="4" height="16" rx="1"/>
+            <rect x="14" y="4" width="4" height="16" rx="1"/>
+          </svg>
+        </button>
+        <button type="button" class="timer-btn-resume" id="btnTimerResume" style="display:none" aria-label="继续" title="继续">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <polygon points="7,4 21,12 7,20"/>
+          </svg>
+        </button>
+        <button type="button" class="timer-btn-done" id="btnTimerStop" style="display:none; flex: 5;" aria-label="完成" title="完成">
+          <!-- <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <rect x="6" y="6" width="12" height="12" rx="1.5"/>
+          </svg> -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4,12.5 9.5,18 20,6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="timer-list-head">
+      <span class="timer-list-title">计时列表</span>
+      <!-- <button type="button" class="timer-clear-btn" id="btnTimerClear" disabled>清空</button> -->
+      <button type="button" class="timer-clear-btn" id="btnTimerClear" disabled aria-label="清空" title="清空">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <g transform="translate(-1,-1) rotate(20 10 10)">
+            <polyline points="3,6 5,6 21,6" />
+            <path d="M19,6l-1,14a2,2 0 0 1-2,2H8a2,2 0 0 1-2-2L5,6"/>
+            <path d="M10,11v6M14,11v6"/>
+            <path d="M9,6V4a1,1 0 0 1 1-1h4a1,1 0 0 1 1,1v2"/>
+          </g>
+          <g>
+            <!-- <circle cx="22" cy="8" r="0.9" fill="currentColor"/> -->
+            <circle cx="22" cy="14" r="0.9" fill="currentColor"/>
+            <circle cx="21" cy="20" r="0.9" fill="currentColor"/>
+          </g>
+        </svg>
+      </button>
+    </div>
+    <div class="timer-list" id="timerList"></div>
+  </section>
   
   <!-- <p class="footnote">仅用于地面站学习与估算，不可作为唯一飞行依据</p> -->
-  <p class="footnote">仅用于地面站考题的学习与计算 (v0.0.8 / 2026-11-01) @zhhh</p>
+  <p class="footnote">仅用于地面站习题的学习与计算 ( &copy;zhhh 2026-11-01 / v0.0.9 )</p>
 </div>
 
 <script>
@@ -1630,12 +2081,15 @@ function updateOffsetDirs(base) {
   const offset = (base % 90 === 0) ? 90 : 45;
   const ccw = norm360(base - offset);
   const cw  = norm360(base + offset);
+  const seg1 = `<button type="button" class="seg" data-offdir="${ccw}">偏${dirName(ccw)}</button>`;
+  const seg2 = `<button type="button" class="seg" data-offdir="${cw}">偏${dirName(cw)}</button>`;
 
   const seg = $('offsetDirSeg');
-  seg.innerHTML = `
-    <button type="button" class="seg" data-offdir="${ccw}">偏${dirName(ccw)}</button>
-    <button type="button" class="seg" data-offdir="${cw}">偏${dirName(cw)}</button>
-  `;
+  seg.innerHTML = base === 315 || base === 270 || base === 225 || base === 180 ? seg2 + seg1 :  seg1 + seg2;
+  // seg.innerHTML = `
+  //   <button type="button" class="seg" data-offdir="${ccw}">偏${dirName(ccw)}</button>
+  //   <button type="button" class="seg" data-offdir="${cw}">偏${dirName(cw)}</button>
+  // `;
 
   let segs = seg.querySelectorAll('.seg');
   segs.forEach(s => {
@@ -1702,6 +2156,68 @@ $('btnOffset').addEventListener('click', () => {
 });
 
 /* ==================== 风向换算（含罗盘） ==================== */
+/* 解析风向输入：支持角度数字（45、-30、45°）与方位词（N/NE/E/SE/S/SW/W/NW 及中文） */
+const BEARING_WORDS = {
+  'N': 0,   '北': 0,   'NORTH': 0,
+  'NE': 45,  'EN': 45,  '东北': 45,  'NORTHEAST': 45,
+  'E': 90,  '东': 90,  'EAST': 90,
+  'SE': 135, 'ES': 135, '东南': 135, 'SOUTHEAST': 135,
+  'S': 180, '南': 180, 'SOUTH': 180,
+  'SW': 225, 'WS': 225, '西南': 225, 'SOUTHWEST': 225,
+  'W': 270, '西': 270, 'WEST': 270,
+  'NW': 315, 'WN': 315, '西北': 315, 'NORTHWEST': 315
+};
+
+function parseBearing2(str) {
+  if (str === null || str === undefined) return NaN;
+  const s = String(str).trim().toUpperCase().replace(/[\s°度]/g, '');
+  if (!s) return NaN;
+  // 纯数字（含负数、小数）
+  if (/^[+-]?(\d+(\.\d*)?|\.\d+)$/.test(s)) return parseFloat(s);
+  // 方位词
+  if (Object.prototype.hasOwnProperty.call(BEARING_WORDS, s)) return BEARING_WORDS[s];
+  return NaN;
+}
+
+/* 解析单个方位：数字 或 方位词 */
+function parseBearingSingle(str) {
+  const s = String(str).trim().toUpperCase().replace(/[\s°度]/g, '');
+  if (!s) return NaN;
+  if (/^[+-]?(\d+(\.\d*)?|\.\d+)$/.test(s)) return parseFloat(s);
+  if (Object.prototype.hasOwnProperty.call(BEARING_WORDS, s)) return BEARING_WORDS[s];
+  return NaN;
+}
+
+/* 解析复合输入：基准 / 偏转方向 / 偏移角度
+   例：NE/E/15 → 45 + 15 = 60°；SE/S/20 → 135 + 20 = 155° */
+function parseBearingInfo(str) {
+  if (str === null || str === undefined) return { value: NaN, note: '' };
+  const raw = String(str).trim();
+  if (!raw) return { value: NaN, note: '' };
+
+  if (/[\\\s\/,／，、]/.test(raw)) {
+    const parts = raw.split(/[\\\s\/／,，、]/).map(x => x.trim()).filter(x => x !== '');
+    if (parts.length !== 3) return { value: NaN, note: '' };
+
+    const base = parseBearingSingle(parts[0]);
+    const dir  = parseBearingSingle(parts[1]);
+    const off  = parseFloat(parts[2].replace(/[\s°度]/g, ''));
+    if (!isFinite(base) || !isFinite(dir) || !isFinite(off)) return { value: NaN, note: '' };
+
+    const diff  = norm180(dir - base);
+    const sign  = diff >= 0 ? 1 : -1;
+    const value = norm360(base + sign * off);
+    const note  = `${parts[0]} 偏 ${parts[1]} ${fmtAngle(off)}° = ${fmtAngle(value)}°`;
+    return { value, note };
+  }
+
+  return { value: parseBearingSingle(raw), note: '' };
+}
+
+function parseBearing(str) {
+  return parseBearingInfo(str).value;
+}
+
 function buildWindCompass(wd, hdg, label, formula) {
   const cx = 80, cy = 80, R = 55;
   const wdRad = rad(wd);
@@ -1769,7 +2285,7 @@ function buildWindCompass(wd, hdg, label, formula) {
   `;
 }
 
-function renderWind(wd) {
+function renderWind(wd, note) {
   const w = norm360(wd);
   const h_head = norm360(w); // 逆风
   const h_tail = norm360(w + 180); // 顺风
@@ -1800,7 +2316,7 @@ function renderWind(wd) {
     .join('');
   // $('windHint').style.display = 'block';
 
-  renderResults('windAResults', [
+  const items = [
     { k: '风向 WD', v: fmt(w, 1) + '°' },
     // { k: '风向箭头 从风的来向指向中心', v: '飞机头 指向航向', cls: 'hl' },
     { k: '风向 WD', v: '箭头从风的来向指向中心', cls: 'hl' },
@@ -1814,7 +2330,10 @@ function renderWind(wd) {
     // { k: '正右前侧风 → 航向 = 风向(' + w + '°) - 45° &ensp;= ', v: fmt(h_right_front, 1) + '°', cls: 'hl' },
     // { k: '正左后侧风 → 航向 = 风向(' + w + '°) + 135° = ', v: fmt(h_left_back, 1) + '°', cls: 'hl' },
     // { k: '正右后侧风 → 航向 = 风向(' + w + '°) - 135° = ', v: fmt(h_right_back, 1) + '°', cls: 'hl' }
-  ]);
+  ];
+  if (note) items.unshift({ k: '解析', v: note });
+
+  renderResults('windAResults', items);
 }
 
 /* $('w_wd').addEventListener('input', () => {
@@ -1831,7 +2350,12 @@ function renderWind(wd) {
 }); */
 
 $('btnWD2HD').addEventListener('click', () => {
-  const wd = parseFloat($('w_wd').value);
+  // const wd = parseFloat($('w_wd').value);
+  // const wd = parseBearing($('w_wd').value);   // ← 原来是 parseFloat
+
+  const info = parseBearingInfo($('w_wd').value);
+  const wd = info.value;
+
   if (!isFinite(wd)) {
     $('windCompasses').innerHTML = '';
     $('windAResults').innerHTML = '';
@@ -1841,9 +2365,10 @@ $('btnWD2HD').addEventListener('click', () => {
     return;
   }
   showSaveButton(true);
-  renderWind(wd);
+  renderWind(wd, info.note);
 
-  localStorage.setItem("wd", JSON.stringify({val: wd}));
+  // localStorage.setItem("wd", JSON.stringify({val: wd}));
+  localStorage.setItem('wd', JSON.stringify({ val: $('w_wd').value.trim() }));
 });
 
 $('w_wd').addEventListener('keydown', e => {
@@ -1865,8 +2390,10 @@ try {
 }
 
 if ($('w_wd').value) {
-  const wd = parseFloat($('w_wd').value);
-  if (isFinite(wd)) renderWind(wd);
+  // const wd = parseBearing($('w_wd').value);   //const wd = parseFloat($('w_wd').value);
+  // if (isFinite(wd)) renderWind(wd);
+  const info = parseBearingInfo($('w_wd').value);
+  if (isFinite(info.value)) renderWind(info.value, info.note);
 }
 
 /* ==================== 三角形计算 ==================== */
@@ -2187,6 +2714,340 @@ function buildTriCards() {
 }
 buildTriCards();
 
+/* ==================== 计时管理 ==================== */
+const TIMER_STORAGE_KEY = 'caac_timer_records_v1';
+
+const timerDigits = $('timerDigits');
+const timerStatus = $('timerStatus');
+const btnTimerStart = $('btnTimerStart');
+const btnTimerPause = $('btnTimerPause');
+const btnTimerResume = $('btnTimerResume');
+const btnTimerStop = $('btnTimerStop');
+const btnTimerClear = $('btnTimerClear');
+const timerListEl = $('timerList');
+const timerPresetRow = $('timerPresetRow');
+
+let timerState = 'idle';        // idle | running | paused
+let timerPreset = 360;          // 秒
+let timerElapsed = 0;           // 已累计毫秒（不含当前运行段）
+let timerStartAt = 0;           // 当前运行段开始时间（performance.now）
+let timerStartWallClock = 0;
+let timerRaf = null;
+let timerBeeped = false;
+let audioCtx = null;
+// let timerRecords = [];
+// let timerNextId = 1;
+
+let timerRecords = loadTimerRecords();
+let timerNextId = timerRecords.reduce((m, r) => Math.max(m, r.id || 0), 0) + 1;
+
+function formatMMSS(sec) {
+  sec = Math.max(0, Math.floor(sec));
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+function formatClock(ts) {
+  const d = new Date(ts);
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  const ss = String(d.getSeconds()).padStart(2, '0');
+  return `${hh}:${mm}:${ss}`;
+}
+
+function getPresetLabel(sec) {
+  if (sec === 360) return '6 分钟';
+  if (sec === 120) return '2 分钟';
+  if (sec === 60) return '1 分钟';
+  return Math.round(sec / 60) + ' 分钟';
+}
+
+
+
+function getPresetLabel(sec) {
+  if (sec === 360) return '6分钟';
+  if (sec === 120) return '2分钟';
+  if (sec === 60) return '1分钟';
+  return Math.round(sec / 60) + '分钟';
+}
+
+function saveTimerRecords() {
+  try {
+    localStorage.setItem(TIMER_STORAGE_KEY, JSON.stringify(timerRecords));
+  } catch (e) {}
+}
+
+function loadTimerRecords() {
+  try {
+    const raw = localStorage.getItem(TIMER_STORAGE_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return [];
+    return arr.filter(r =>
+      r && typeof r.id === 'number' &&
+      typeof r.startAt === 'number' &&
+      typeof r.endAt === 'number'
+    ).map(r => ({
+      id: r.id,
+      preset: r.preset || 360,
+      presetLabel: r.presetLabel || getPresetLabel(r.preset || 360),
+      totalSec: r.totalSec || 0,
+      overSec: r.overSec || 0,
+      startAt: r.startAt,
+      endAt: r.endAt
+    }));
+  } catch (e) {
+    return [];
+  }
+}
+
+function getElapsedMs() {
+  if (timerState === 'running') {
+    return timerElapsed + (performance.now() - timerStartAt);
+  }
+  return timerElapsed;
+}
+
+function renderTimerFace() {
+  const elapsedSec = getElapsedMs() / 1000;
+  const remain = timerPreset - elapsedSec;
+
+  if (remain >= 0) {
+    timerDigits.textContent = formatMMSS(remain);
+    timerDigits.classList.remove('overtime');
+    timerDigits.classList.toggle('paused', timerState === 'paused');
+    if (timerState === 'running') timerStatus.textContent = timerPreset === 360 ? '倒计时中，请做题' : '倒计时中，请阅题';
+    else if (timerState === 'paused') timerStatus.textContent = '已暂停';
+    else timerStatus.textContent = timerPreset === 360 ? '准备做题' : '准备阅题';;
+  } else {
+    const over = -remain;
+    timerDigits.textContent = '+' + formatMMSS(over);
+    timerDigits.classList.add('overtime');
+    timerDigits.classList.toggle('paused', timerState === 'paused');
+    if (timerState === 'running') timerStatus.textContent = '已经超时，请加油';
+    else if (timerState === 'paused') timerStatus.textContent = '已暂停';
+  }
+}
+
+function stopTimerLoop() {
+  if (timerRaf) {
+    cancelAnimationFrame(timerRaf);
+    timerRaf = null;
+  }
+}
+
+function timerLoop() {
+  const elapsedSec = getElapsedMs() / 1000;
+  if (!timerBeeped && elapsedSec >= timerPreset) {
+    timerBeeped = true;
+    beep();
+  }
+
+  renderTimerFace();
+  if (timerState === 'running') {
+    timerRaf = requestAnimationFrame(timerLoop);
+  } else {
+    timerRaf = null;
+  }
+}
+
+function setTimerButtons() {
+  const isIdle = timerState === 'idle';
+  const isRunning = timerState === 'running';
+  const isPaused = timerState === 'paused';
+
+  btnTimerStart.style.display = isIdle ? '' : 'none';
+  btnTimerPause.style.display = isRunning ? '' : 'none';
+  btnTimerResume.style.display = isPaused ? '' : 'none';
+  btnTimerStop.style.display = (isRunning || isPaused) ? '' : 'none';
+
+  // 预设选项在非 idle 时禁用，避免计时中切换
+  [...timerPresetRow.querySelectorAll('input[type="radio"]')].forEach(r => {
+    r.disabled = !isIdle;
+  });
+}
+
+function beep() {
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    const t0 = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, t0);
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(0.35, t0 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.5);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(t0);
+    osc.stop(t0 + 0.55);
+  } catch (e) {}
+}
+
+function startTimer() {
+  const checked = timerPresetRow.querySelector('input[type="radio"]:checked');
+  timerPreset = checked ? parseInt(checked.value) : 360;
+  timerElapsed = 0;
+  timerStartAt = performance.now();
+  timerStartWallClock = Date.now();
+  timerBeeped = false;
+  timerState = 'running';
+  setTimerButtons();
+  renderTimerFace();
+  stopTimerLoop();
+  timerRaf = requestAnimationFrame(timerLoop);
+}
+
+function pauseTimer() {
+  if (timerState !== 'running') return;
+  timerElapsed += performance.now() - timerStartAt;
+  timerStartAt = 0;
+  timerState = 'paused';
+  stopTimerLoop();
+  setTimerButtons();
+  renderTimerFace();
+}
+
+function resumeTimer() {
+  if (timerState !== 'paused') return;
+  timerStartAt = performance.now();
+  timerState = 'running';
+  setTimerButtons();
+  renderTimerFace();
+  stopTimerLoop();
+  timerRaf = requestAnimationFrame(timerLoop);
+}
+
+function stopTimer() {
+  if (timerState === 'idle') return;
+  const elapsedMs = getElapsedMs();
+  const endWallClock = Date.now();
+  
+  timerElapsed = 0;
+  timerStartAt = 0;
+  timerState = 'idle';
+  stopTimerLoop();
+
+  const totalSec = elapsedMs / 1000;
+  const overSec = totalSec - timerPreset;
+  const record = {
+    id: timerNextId++,
+    preset: timerPreset,
+    presetLabel: getPresetLabel(timerPreset),
+    totalSec,
+    overSec,
+    startAt: timerStartWallClock,
+    endAt: endWallClock,
+    stoppedAt: new Date()
+  };
+  timerRecords.unshift(record);
+  saveTimerRecords();
+
+  setTimerButtons();
+  renderTimerFace();
+  renderTimerList();
+}
+
+function renderTimerList() {
+  btnTimerClear.disabled = timerRecords.length === 0;
+
+  if (!timerRecords.length) {
+    timerListEl.innerHTML = '<div class="timer-empty">暂无计时记录</div>';
+    return;
+  }
+
+  timerListEl.innerHTML = timerRecords.map(r => {
+    const isOver = r.overSec > 0.05;
+    const titleText = `&nbsp;${formatClock(r.startAt)} ~ ${formatClock(r.endAt)}`;
+
+    // ${isOver ? '已超时，还需努力...' : '用时'}
+    const overTextK = isOver ? (r.preset === 360 ? "已超时，还需努力..." : "") : (r.preset === 360 ? "完成不错，继续保持！！！" : "");
+    const overText = isOver
+      ? '超时 + ' + formatMMSS(r.overSec)
+      : '用时 ' + formatMMSS(r.totalSec);
+      // : '剩余 ' + formatMMSS(-r.overSec);
+    const stoppedAt = r.stoppedAt || new Date(r.endAt);
+    const hh = String(stoppedAt.getHours()).padStart(2, '0');
+    const mm = String(stoppedAt.getMinutes()).padStart(2, '0');
+    const ss = String(stoppedAt.getSeconds()).padStart(2, '0');
+
+    return `
+      <div class="timer-record ${isOver ? 'overtime' : ''}">
+        <div class="timer-record-head">
+          <div class="timer-record-title">
+            <span class="preset-tag">${r.presetLabel}</span>
+            <!-- 用时 ${formatMMSS(r.totalSec)} -->
+            ${titleText}
+          </div>
+          <!--<button class="timer-record-del" data-id="${r.id}">删除</button>-->
+          <button class="timer-record-del" data-id="${r.id}" aria-label="删除" title="删除">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="3,6 5,6 21,6"/>
+              <path d="M19,6l-1,14a2,2 0 0 1-2,2H8a2,2 0 0 1-2-2L5,6"/>
+              <path d="M10,11v6M14,11v6"/>
+              <path d="M9,6V4a1,1 0 0 1 1-1h4a1,1 0 0 1 1,1v2"/>
+            </svg>
+          </button>
+        </div>
+        <div class="timer-record-vals">
+          <div class="timer-record-val ${isOver ? 'over' : ''}">
+            <span class="v">${overText}</span>
+            <span class="k">${overTextK}</span>
+          </div>
+          <!--
+          <div class="timer-record-val">
+            <span class="k">停止时间</span>
+            <span class="v">${hh}:${mm}:${ss}</span>
+          </div>
+          -->
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+btnTimerStart.addEventListener('click', startTimer);
+btnTimerPause.addEventListener('click', pauseTimer);
+btnTimerResume.addEventListener('click', resumeTimer);
+btnTimerStop.addEventListener('click', stopTimer);
+
+btnTimerClear.addEventListener('click', () => {
+  if (!timerRecords.length) return;
+  timerRecords = [];
+  saveTimerRecords();
+  renderTimerList();
+});
+
+timerListEl.addEventListener('click', e => {
+  const btn = e.target.closest('.timer-record-del');
+  if (!btn) return;
+  const id = parseInt(btn.dataset.id);
+  timerRecords = timerRecords.filter(r => r.id !== id);
+  saveTimerRecords();
+  renderTimerList();
+});
+
+/* 预设切换时刷新显示（仅 idle 状态可用） */
+timerPresetRow.querySelectorAll('input[type="radio"]').forEach(r => {
+  r.addEventListener('change', () => {
+    if (timerState !== 'idle') return;
+    timerPreset = parseInt(r.value);
+    renderTimerFace();
+  });
+});
+
+/* 初始化计时 */
+renderTimerFace();
+setTimerButtons();
+renderTimerList();
+
 async function saveImage(invoke, img, filename = 'image.png', scale = 2) {
   // 创建 canvas，尺寸与原图一致
   const canvas = document.createElement('canvas');
@@ -2365,6 +3226,17 @@ function showSaveButton(show) {
   const display = show === true && typeof window.snapdom !== 'undefined' ? "block" : "none";
   $('btnSave2png').style.setProperty("display", display);
 }
+
+// import { getCurrentWindow } from '@tauri-apps/api/window';
+
+// const appWindow = getCurrentWindow();
+
+// 开启置顶
+// await appWindow.setAlwaysOnTop(true);
+
+// 取消置顶
+// await appWindow.setAlwaysOnTop(false);
+
 
 /* ==================== 回车快捷计算 ==================== */
 const enterBind = (ids, btnId) => {
